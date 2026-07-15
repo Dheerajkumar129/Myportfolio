@@ -32,57 +32,75 @@ export default function Navbar() {
       <motion.nav
         initial={{ y: -80, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'glass border-b border-white/8 shadow-2xl'
-            : 'bg-transparent'
+            ? 'py-3 bg-black/40 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
+            : 'py-5 bg-transparent'
         }`}
       >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+        <div className="max-w-6xl mx-auto px-6 sm:px-8">
+          <div className="flex items-center justify-between">
             {/* Logo */}
-            <NavLink to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center shadow-lg group-hover:shadow-indigo-500/40 transition-shadow duration-300">
-                <Code2 className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold text-lg gradient-text hidden sm:block">DK</span>
+            <NavLink to="/" className="flex items-center gap-2.5 group">
+              <motion.div
+                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/10"
+              >
+                <Code2 className="w-5.5 h-5.5 text-white" />
+              </motion.div>
+              <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+                DK
+              </span>
             </NavLink>
 
-            {/* Desktop Links */}
-            <div className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  className={({ isActive }) =>
-                    `px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
+            {/* Desktop Navigation Links */}
+            <div className="hidden md:flex items-center gap-2 p-1.5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <NavLink
+                    key={link.path}
+                    to={link.path}
+                    className="relative px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-colors duration-300"
+                    style={{
+                      color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.55)',
+                    }}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeTabGlow"
+                        className="absolute inset-0 rounded-xl bg-white/[0.04] border border-white/10"
+                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{link.label}</span>
+                  </NavLink>
+                );
+              })}
             </div>
 
-            {/* CTA + Mobile Toggle */}
-            <div className="flex items-center gap-3">
-              <a
+            {/* Hire Me CTA button */}
+            <div className="flex items-center gap-4">
+              <motion.a
+                whileHover={{ scale: 1.03, y: -1 }}
+                whileTap={{ scale: 0.97 }}
                 href="mailto:dheerajkumar7135227@gmail.com"
-                className="hidden sm:block btn-primary text-sm px-4 py-2"
+                className="hidden sm:inline-flex btn-apple-primary px-5 py-2"
               >
                 Hire Me
-              </a>
-              <button
+              </motion.a>
+
+              {/* Mobile Menu Button */}
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setMobileOpen(!mobileOpen)}
-                className="md:hidden p-2 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-all"
+                className="md:hidden p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5 transition-all"
                 aria-label="Toggle menu"
               >
-                {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              </button>
+                {mobileOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
+              </motion.button>
             </div>
           </div>
         </div>
@@ -95,28 +113,29 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="fixed top-16 left-0 right-0 z-40 glass border-b border-white/8 md:hidden"
+            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+            className="fixed top-18 left-4 right-4 z-40 p-4 rounded-2xl apple-glass border border-white/10 md:hidden"
           >
-            <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col gap-2">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.path}
-                  to={link.path}
-                  className={({ isActive }) =>
-                    `px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+            <div className="flex flex-col gap-2">
+              {navLinks.map((link) => {
+                const isActive = location.pathname === link.path;
+                return (
+                  <NavLink
+                    key={link.path}
+                    to={link.path}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
                       isActive
-                        ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                        : 'text-slate-400 hover:text-white hover:bg-white/5'
-                    }`
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              ))}
+                        ? 'bg-white/5 text-white border border-white/10'
+                        : 'text-white/60 hover:text-white hover:bg-white/[0.02]'
+                    }`}
+                  >
+                    {link.label}
+                  </NavLink>
+                );
+              })}
               <a
                 href="mailto:dheerajkumar7135227@gmail.com"
-                className="btn-primary text-center mt-2"
+                className="btn-apple-primary text-center mt-3 py-3 w-full"
               >
                 Hire Me
               </a>
