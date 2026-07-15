@@ -2,12 +2,12 @@
 
 @layer base {
   :root {
-    --color-bg: 3 0 20; /* Deep Cybernetic Space #030014 */
-    --color-primary: 99 102 241; /* Cyber Indigo */
-    --color-accent: 219 39 119; /* Magenta Glow */
-    --color-cyan: 6 182 212; /* Neon Cyan */
-    --color-text: 248 250 252;
-    --color-text-muted: 148 163 184;
+    --color-bg: 5 6 10; /* Terminal Deep Slate Black */
+    --color-primary: 34 197 94; /* Phosphor Green #22c55e */
+    --color-accent: 245 158 11; /* Phosphor Amber #f59e0b */
+    --color-cyan: 6 182 212; /* Terminal Cyber Cyan */
+    --color-text: 226 232 240;
+    --color-text-muted: 100 116 139;
   }
 
   * {
@@ -22,153 +22,97 @@
   }
 
   body {
-    background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 10% 40%, rgba(219, 39, 119, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 90% 70%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
+    background: radial-gradient(circle at 50% 10%, rgba(34, 197, 94, 0.06) 0%, transparent 55%),
+                radial-gradient(circle at 90% 80%, rgba(245, 158, 11, 0.04) 0%, transparent 40%),
                 rgb(var(--color-bg));
     color: rgb(var(--color-text));
-    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
     min-height: 100vh;
     overflow-x: hidden;
-    letter-spacing: -0.01em;
   }
 
   ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: rgba(3, 0, 20, 0.5);
+    background: rgba(5, 6, 10, 0.5);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(34, 197, 94, 0.15);
     border-radius: 9999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.18);
+    background: rgba(34, 197, 94, 0.3);
   }
 }
 
 @layer components {
-  /* Apple Glassmorphism with slight metallic sheen */
-  .apple-glass {
-    background: rgba(255, 255, 255, 0.01);
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
-  }
-
-  /* Interactive Spotlight Border Cards */
-  .spotlight-card {
+  /* CRT Monitor Scanline Overlay Effect */
+  .crt-screen {
     position: relative;
-    border-radius: 30px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    background: rgba(255, 255, 255, 0.015);
-    overflow: hidden;
-    transition: background 0.3s, border-color 0.3s;
-  }
-
-  .spotlight-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
-      rgba(99, 102, 241, 0.06),
-      transparent 40%
-    );
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  .spotlight-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: 30px;
-    padding: 1px;
-    background: radial-gradient(
-      400px circle at var(--mouse-x, 0) var(--mouse-y, 0),
-      rgba(255, 255, 255, 0.18),
-      transparent 40%
-    );
-    -webkit-mask: 
-      linear-gradient(#fff 0 0) content-box, 
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    z-index: 1;
-    pointer-events: none;
-  }
-
-  /* Typography Gradients */
-  .gradient-text-apple {
-    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #64748b 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .text-glow-blue {
-    text-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
-  }
-
-  /* Neon Glowing Elements */
-  .glow-cyan {
-    box-shadow: 0 0 20px 0 rgba(6, 182, 212, 0.25);
-  }
-
-  .glow-magenta {
-    box-shadow: 0 0 25px 0 rgba(219, 39, 119, 0.3);
-  }
-
-  /* Premium Buttons */
-  .btn-apple-primary {
-    position: relative;
-    padding: 0.75rem 1.75rem;
-    border-radius: 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #000;
-    background: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.15);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
     overflow: hidden;
   }
 
-  .btn-apple-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.35), 0 0 15px rgba(99, 102, 241, 0.2);
-    background: #f8fafc;
+  .crt-screen::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+    background-size: 100% 3px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0.85;
   }
 
-  .btn-apple-secondary {
-    padding: 0.75rem 1.75rem;
-    border-radius: 16px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #fff;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
+  /* Blinking terminal cursor */
+  .terminal-cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background-color: #22c55e;
+    animation: blink 1s step-end infinite;
+    vertical-align: middle;
+    margin-left: 4px;
   }
 
-  .btn-apple-secondary:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.05);
+  .terminal-cursor-amber {
+    background-color: #f59e0b;
+  }
+
+  @keyframes blink {
+    from, to { background-color: transparent }
+    50% { background-color: currentColor }
+  }
+
+  /* Glowing text styles */
+  .text-glow-green {
+    text-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+  }
+
+  .text-glow-amber {
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  }
+
+  /* Retro Glass Frame */
+  .retro-terminal-frame {
+    background: rgba(5, 8, 12, 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(34, 197, 94, 0.15);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(34, 197, 94, 0.05);
+  }
+
+  .retro-terminal-frame:hover {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 12px 45px rgba(34, 197, 94, 0.06), inset 0 1px 0 rgba(34, 197, 94, 0.1);
+  }
+
+  /* High-Tech Custom Grid */
+  .tech-grid {
+    background-image: 
+      linear-gradient(rgba(34, 197, 94, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 197, 94, 0.02) 1px, transparent 1px);
+    background-size: 30px 30px;
   }
 }

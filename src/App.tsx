@@ -32,7 +32,7 @@ function AnimatedRoutes({ isDark }: { isDark: boolean }) {
         <Routes location={location}>
           <Route
             path="/"
-            element={<Home config={profileData.hero} homeCards={profileData.homeCards} isDark={isDark} />}
+            element={<Home config={profileData.hero} homeCards={profileData.homeCards} projects={profileData.projects} skills={profileData.skills} isDark={isDark} />}
           />
           <Route
             path="/projects"
@@ -48,7 +48,7 @@ function AnimatedRoutes({ isDark }: { isDark: boolean }) {
           />
           <Route
             path="/timeline"
-            element={<Timeline timeline={profileData.journey} isDark={isDark} />}
+            element={<Timeline timeline={profileData.journey} />}
           />
           <Route
             path="/contact"
