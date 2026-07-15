@@ -10,6 +10,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import SEO from '../components/SEO';
+import CardSpotlight from '../components/CardSpotlight';
 
 interface SkillsProps {
   categories: SkillCategory[];
@@ -46,6 +47,21 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
       case 'layers': return Layers;
       default: return Database;
     }
+  };
+
+  // Map proficiency level to percentage width
+  const getProficiencyWidth = (level: string) => {
+    const norm = (level || '').toLowerCase();
+    if (norm.includes('expert')) return 'w-[95%]';
+    if (norm.includes('advanced')) return 'w-[85%]';
+    return 'w-[70%]';
+  };
+
+  const getProficiencyText = (level: string) => {
+    const norm = (level || '').toLowerCase();
+    if (norm.includes('expert')) return '95%';
+    if (norm.includes('advanced')) return '85%';
+    return '70%';
   };
 
   const principles = [
@@ -115,11 +131,11 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
           transition={{ duration: 0.6 }}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] font-sans uppercase w-fit mb-6 ${
             isDark 
-              ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
-              : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
+              ? 'bg-[#a855f7]/15 border-[#a855f7]/30 text-[#c084fc]' 
+              : 'bg-[#a855f7]/10 border-[#a855f7]/20 text-[#a855f7]'
           }`}
         >
-          <Zap className="w-3.5 h-3.5 animate-pulse" />
+          <Zap className="w-3.5 h-3.5 animate-pulse text-[#c084fc]" />
           <span>DEVELOPER STACK CONFIG</span>
         </motion.div>
 
@@ -173,59 +189,65 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
                   key={cat.title}
                   layout
                   variants={itemVariants}
-                  whileHover={{ y: -4, scale: 1.005 }}
-                  className={`p-6 md:p-8 rounded-[40px] border transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group relative overflow-hidden ${spanClass} ${
-                    isDark 
-                      ? 'bg-gradient-to-b from-[#141416]/80 to-[#09090b]/90 border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.03)] hover:border-[#007AFF]/35' 
-                      : 'bg-white hover:bg-slate-100/50 border-neutral-200/60 hover:border-[#007AFF]/25 shadow-sm'
-                  }`}
+                  className={spanClass}
                 >
-                  <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full filter blur-[80px] opacity-0 group-hover:opacity-100 bg-[#007AFF]/15 pointer-events-none transition-opacity duration-500" />
+                  <CardSpotlight
+                    className={`h-full p-6 md:p-8 rounded-[40px] border transition-all duration-500 hover:shadow-2xl flex flex-col justify-between group relative overflow-hidden ${
+                      isDark 
+                        ? 'bg-neutral-900/30 border-white/5 hover:border-[#a855f7]/35 shadow-sm' 
+                        : 'bg-white hover:bg-slate-100/50 border-neutral-200/60 hover:border-[#a855f7]/25 shadow-sm'
+                    }`}
+                  >
+                    <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full filter blur-[80px] opacity-0 group-hover:opacity-100 bg-[#a855f7]/10 pointer-events-none transition-opacity duration-500" />
 
-                  <div>
-                    <div className="flex items-center justify-between gap-3 mb-6">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2.5 rounded-xl ${
-                          isDark ? 'bg-white/5 text-white/80' : 'bg-slate-100 text-neutral-800'
-                        } group-hover:bg-[#007AFF] group-hover:text-white transition-colors duration-300`}>
-                          <Icon className="w-4 h-4" />
+                    <div className="w-full">
+                      <div className="flex items-center justify-between gap-3 mb-6">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2.5 rounded-xl ${
+                            isDark ? 'bg-white/5 text-white/80' : 'bg-slate-100 text-neutral-800'
+                          } group-hover:bg-[#a855f7] group-hover:text-white transition-colors duration-300`}>
+                            <Icon className="w-4.5 h-4.5" />
+                          </div>
+                          <h3 className="text-sm font-semibold tracking-wider font-sans uppercase">
+                            {cat.title}
+                          </h3>
                         </div>
-                        <h3 className="text-sm font-semibold tracking-wider font-sans uppercase">
-                          {cat.title}
-                        </h3>
+                        <span className={`text-[9px] font-mono tracking-widest ${isDark ? 'text-slate-300' : 'text-slate-655'}`}>
+                          {(cat.skills || []).length} Units
+                        </span>
                       </div>
-                      <span className={`text-[9px] font-mono tracking-widest ${isDark ? 'text-slate-300' : 'text-slate-650'}`}>
-                        {(cat.skills || []).length} Units
+
+                      {/* Displaying skills with glowing progress indicators */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        {(cat.skills || []).map(skill => (
+                          <div key={skill.name} className="flex flex-col gap-1.5">
+                            <div className="flex items-center justify-between text-xs px-1">
+                              <span className="font-semibold">{skill.name}</span>
+                              <span className="text-[10px] font-mono opacity-65 flex items-center gap-1">
+                                {skill.level}
+                                <span className="text-[#a855f7] font-bold">({getProficiencyText(skill.level)})</span>
+                              </span>
+                            </div>
+                            <div className={`h-1.5 w-full rounded-full overflow-hidden ${isDark ? 'bg-white/5' : 'bg-slate-150'}`}>
+                              <div 
+                                className={`h-full rounded-full bg-gradient-to-r from-[#a855f7] to-cyan-400 ${getProficiencyWidth(skill.level)}`}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className={`text-[10px] font-mono leading-none tracking-wide pt-4 border-t flex items-center justify-between ${
+                      isDark ? 'border-white/[0.06] text-slate-300' : 'border-neutral-100 text-slate-600'
+                    }`}>
+                      <span>System Reliability</span>
+                      <span className="text-emerald-500 font-bold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Verified
                       </span>
                     </div>
-
-                    <div className="flex flex-wrap gap-2 mb-8">
-                      {(cat.skills || []).map(skill => (
-                        <motion.span
-                          key={skill.name}
-                          whileHover={{ y: -2, scale: 1.03 }}
-                          transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                          className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide border cursor-default select-none ${
-                            isDark 
-                              ? 'bg-white/[0.04] border-white/[0.06] text-white/80 hover:bg-white/[0.08] hover:border-white/15 hover:text-white' 
-                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100 hover:border-slate-300 hover:text-neutral-900'
-                          }`}
-                        >
-                          {skill.name}
-                        </motion.span>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className={`text-[10px] font-mono leading-none tracking-wide pt-4 border-t flex items-center justify-between ${
-                    isDark ? 'border-white/[0.06] text-slate-300' : 'border-neutral-100 text-slate-600'
-                  }`}>
-                    <span>System Reliability</span>
-                    <span className="text-emerald-500 font-bold flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Verified
-                    </span>
-                  </div>
+                  </CardSpotlight>
                 </motion.div>
               );
             })}
@@ -250,40 +272,41 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
           {strengths.map((strength) => {
             const IconComponent = getIconComponent(strength.icon);
             return (
-              <div
-                key={strength.id}
-                className={`p-6 rounded-[32px] border flex flex-col justify-between group hover:scale-[1.01] transition-all duration-300 ${
-                  isDark 
-                    ? 'bg-neutral-900/40 border-white/5 hover:border-white/15 hover:shadow-[0_15px_30px_rgba(0,122,255,0.06)]' 
-                    : 'bg-white border-neutral-200 hover:border-neutral-350 hover:shadow-[0_10px_25px_rgba(0,0,0,0.02)]'
-                }`}
-              >
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="text-[#007AFF] group-hover:scale-105 transition-transform duration-300">
-                      <IconComponent className="w-5 h-5" />
+              <div key={strength.id}>
+                <CardSpotlight
+                  className={`h-full p-6 rounded-[32px] border flex flex-col justify-between group transition-all duration-300 ${
+                    isDark 
+                      ? 'bg-neutral-900/30 border-white/5 hover:border-white/15' 
+                      : 'bg-white border-neutral-200 hover:border-neutral-350 shadow-sm'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="text-[#a855f7] group-hover:scale-105 transition-transform duration-300">
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <h3 className="text-base font-semibold tracking-tight font-sans group-hover:text-[#a855f7] transition-colors">
+                        {strength.title}
+                      </h3>
                     </div>
-                    <h3 className="text-base font-semibold tracking-tight font-sans group-hover:text-[#007AFF] transition-colors">
-                      {strength.title}
-                    </h3>
+                    <p className={`text-xs font-light leading-relaxed mb-6 ${
+                      isDark ? 'text-slate-200' : 'text-slate-705'
+                    }`}>
+                      {strength.desc}
+                    </p>
                   </div>
-                  <p className={`text-xs font-light leading-relaxed mb-6 ${
-                    isDark ? 'text-slate-200' : 'text-slate-705'
-                  }`}>
-                    {strength.desc}
-                  </p>
-                </div>
 
-                <div className={`pt-4 border-t border-solid flex items-center justify-between ${
-                  isDark ? 'border-white/[0.06]' : 'border-neutral-100'
-                }`}>
-                  <span className={`text-[9px] uppercase font-mono tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
-                    Focus Area
-                  </span>
-                  <span className="text-[10px] font-mono font-semibold tracking-wider text-[#007AFF] uppercase">
-                    {strength.signal}
-                  </span>
-                </div>
+                  <div className={`pt-4 border-t border-solid flex items-center justify-between ${
+                    isDark ? 'border-white/[0.06]' : 'border-neutral-100'
+                  }`}>
+                    <span className={`text-[9px] uppercase font-mono tracking-widest ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                      Focus Area
+                    </span>
+                    <span className="text-[10px] font-mono font-semibold tracking-wider text-[#a855f7] uppercase">
+                      {strength.signal}
+                    </span>
+                  </div>
+                </CardSpotlight>
               </div>
             );
           })}
@@ -295,7 +318,7 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           <div className="lg:col-span-4 flex flex-col justify-start">
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#007AFF] block mb-3">
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#a855f7] block mb-3">
               METHODOLOGY
             </span>
             <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight mb-4">
@@ -317,7 +340,7 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
                     {p.title}
                   </h3>
                 </div>
-                <p className={`text-xs font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
+                <p className={`text-xs font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-605'}`}>
                   {p.desc}
                 </p>
               </div>

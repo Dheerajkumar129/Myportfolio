@@ -151,7 +151,7 @@ function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
           return (
             <div key={idx} className="flex items-start gap-2 pl-1.5 my-1">
               <span className="text-cyan-400 mt-2 shrink-0 block w-1.5 h-1.5 rounded-full bg-cyan-450 shadow-[0_0_6px_#00E5FF]" />
-              <span className={isDark ? 'text-slate-200' : 'text-slate-705'}>
+              <span className={isDark ? 'text-slate-200' : 'text-slate-700'}>
                 {parsedElements.length > 0 ? parsedElements : content}
               </span>
             </div>
@@ -166,6 +166,26 @@ function FormattedMessage({ text, isDark }: { text: string; isDark: boolean }) {
       })}
     </div>
   );
+}
+
+// Typewriter animation wrapper component for streaming responses
+function TypewriterText({ text, isDark }: { text: string; isDark: boolean }) {
+  const [displayedText, setDisplayedText] = useState('');
+
+  useEffect(() => {
+    let index = 0;
+    setDisplayedText('');
+    const timer = setInterval(() => {
+      setDisplayedText((prev) => prev + text.charAt(index));
+      index++;
+      if (index >= text.length) {
+        clearInterval(timer);
+      }
+    }, 12); // snappy character speed
+    return () => clearInterval(timer);
+  }, [text]);
+
+  return <FormattedMessage text={displayedText} isDark={isDark} />;
 }
 
 interface Message {
@@ -183,6 +203,8 @@ const QUICK_STARTS = [
   "How can I contact you?"
 ];
 
+type PersonalityMode = 'recruiter' | 'technical' | 'creative';
+
 export default function Chatbot({ isDark }: { isDark: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -190,6 +212,7 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
   const [isLoading, setIsLoading] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(false);
   const [selectedTrace, setSelectedTrace] = useState<any | null>(null);
+  const [personality, setPersonality] = useState<PersonalityMode>('recruiter');
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -219,6 +242,21 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
     return () => clearTimeout(timer);
   }, [isOpen, messages]);
 
+  // Output custom greeting when personality changes
+  useEffect(() => {
+    if (messages.length === 0 && isOpen) {
+      let greeting = '';
+      if (personality === 'recruiter') {
+        greeting = "### Greeting, Recruiter!\nI am Addy, configured in **Professional Mode**. I can assist you with Dheeraj's contract availability, background checks, and contact details.";
+      } else if (personality === 'technical') {
+        greeting = "### Telemetry Established (Technical Mode)\nI am running deep tech-checks. Ask me about Dheeraj's clean-code practices, algorithm efficiency, and React architecture.";
+      } else {
+        greeting = "### Hey there! (Creative Mode)\nI'm Addy, let's keep it friendly! Dheeraj loves coding, training AI models, and building clean interfaces. Ask me anything!";
+      }
+      setMessages([{ role: 'model', content: greeting }]);
+    }
+  }, [personality, isOpen, messages.length]);
+
   const handleSendMessage = async (textToSend: string) => {
     if (!textToSend.trim() || isLoading) return;
 
@@ -235,62 +273,78 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
         latency_ms: Math.floor(Math.random() * 250) + 120,
         tokens_input: Math.floor(Math.random() * 300) + 200,
         tokens_output: Math.floor(Math.random() * 200) + 100,
-        cost_est: 0.00012,
+        cost_est: 0.00014,
         chunks: [] as any[]
       };
 
       const query = textToSend.toLowerCase();
 
-      if (query.includes('project')) {
-        responseText = "### Featured Projects:\n" +
-          "* **Sign Language System**: ML system utilizing CNN & OpenCV to recognize gestures in real-time. [View Source](https://github.com/Dheerajkumar129/Sign-language-recognition-)\n" +
-          "* **Inventory Management**: Tkinter-based desktop catalog tool with SQLite storage. [View Source](https://github.com/Dheerajkumar129/inventory-management-system-)\n" +
-          "* **OOP Payroll System**: Desktop application built using C++ with clear class layouts. [View Source](https://github.com/Dheerajkumar129/payroll-management-system)\n" +
-          "\nCheck out the full [Projects Catalog](/projects) page for more details!";
-        mockTrace.chunks = [
-          { source: 'portfolioData.ts', title: 'Projects Catalog Array', similarity: 0.94 }
-        ];
-      } else if (query.includes('stack') || query.includes('skills') || query.includes('technolog')) {
-        responseText = "### Technical Stack:\n" +
-          "* **Languages**: JavaScript, TypeScript, Python, C++, SQL, C\n" +
-          "* **Web Core**: React JS, HTML5, CSS3, TailwindCSS\n" +
-          "* **AI Alignment**: RLHF training data, structured evaluations, Fact-Checking protocols\n" +
-          "* **Utilities**: Tableau, Git, GitHub\n" +
-          "\nRead more on the [Skills Stack](/skills) page!";
-        mockTrace.chunks = [
-          { source: 'portfolioData.ts', title: 'Skills & Strengths Matrix', similarity: 0.91 }
-        ];
-      } else if (query.includes('certificat')) {
-        responseText = "### Verified Accreditations:\n" +
-          "* **Python for Data Science** — Issued by IBM\n" +
-          "* **OOPs in C++** — Issued by Coding Ninjas\n" +
-          "* **DSA Bootcamp** — Issued by Coding Ninjas\n" +
-          "* **C Programming** — Issued by Google (via Coursera)\n" +
-          "\nBrowse them all under the [Certifications Catalog](/certifications)!";
-        mockTrace.chunks = [
-          { source: 'portfolioData.ts', title: 'Certifications Catalog Array', similarity: 0.89 }
-        ];
-      } else if (query.includes('contact') || query.includes('email') || query.includes('hire')) {
-        responseText = "### Let's Collaborate:\n" +
-          "You can reach out directly via these channels:\n" +
-          "* **Email**: [dheerajkumar7135227@gmail.com](mailto:dheerajkumar7135227@gmail.com)\n" +
-          "* **LinkedIn**: [linkedin.com/in/dheerajkumar45](https://linkedin.com/in/dheerajkumar45)\n" +
-          "* **GitHub**: [github.com/Dheerajkumar129](https://github.com/Dheerajkumar129)\n" +
-          "\nOr submit a secure form directly on the [Contact Gateway](/contact) page!";
-        mockTrace.chunks = [
-          { source: 'portfolioData.ts', title: 'Direct Contact Coordinates', similarity: 0.96 }
-        ];
+      // Personality adjustments to responses
+      if (personality === 'recruiter') {
+        if (query.includes('project')) {
+          responseText = "### Verified Corporate/Academic Projects:\n" +
+            "* **Indian Sign Language Recognizer** (ML): Solves accessibility gaps using CNN & OpenCV with a 94% accuracy rate. [Source Repo](https://github.com/Dheerajkumar129/Sign-language-recognition-)\n" +
+            "* **Desktop Inventory Catalog** (Python/SQLite): Clean transactional CRUD tracking. [Source Repo](https://github.com/Dheerajkumar129/inventory-management-system-)\n" +
+            "\nExplore more on the [Projects Page](/projects)!";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'Recruiter Project Outlines', similarity: 0.95 }];
+        } else if (query.includes('stack') || query.includes('skills')) {
+          responseText = "### Professional Skills Summary:\n" +
+            "* **AI Annotation/RLHF**: Model response grading, fact verification, logical analysis.\n" +
+            "* **Web Frontends**: React JS, TypeScript, TailwindCSS, State Management.\n" +
+            "* **Languages**: C++, Python, SQL.\n" +
+            "\nFull details on the [Skills Stack](/skills).";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'Professional Skills Matrix', similarity: 0.92 }];
+        } else if (query.includes('certificat')) {
+          responseText = "### Core Accreditations:\n" +
+            "* **Python Data Science** (IBM verified)\n" +
+            "* **C++ OOPs & Data Structures** (Coding Ninjas)\n" +
+            "\nSee certificates under [Certifications Page](/certifications).";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'Accreditation Records', similarity: 0.9 }];
+        } else {
+          responseText = "### Recruiter Command Console:\n" +
+            "Dheeraj is currently open to remote frontend contract roles, logical annotation task assignments, and software engineering positions. How would you like to proceed?\n" +
+            "* Ask about **hiring availability**\n" +
+            "* Go to the [Contact Form](/contact)\n" +
+            "* Direct Mail: [dheerajkumar7135227@gmail.com](mailto:dheerajkumar7135227@gmail.com)";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'Recruiter Outreach Coordinates', similarity: 0.88 }];
+        }
+      } else if (personality === 'technical') {
+        if (query.includes('project')) {
+          responseText = "### System Engineering Highlights:\n" +
+            "* **ISL Hand Gesture System**: Implemented CNN and LSTM models to classify real-time frames with cvzone & Mediapipe at a fluid latency of **30fps**.\n" +
+            "* **Payroll Calculator**: Built modular object-oriented structures in C++ simulating complex salary allowance and tax logic.\n" +
+            "\nReview source repositories on the [Projects Page](/projects).";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'System Architecture Chunks', similarity: 0.94 }];
+        } else if (query.includes('stack') || query.includes('skills')) {
+          responseText = "### Deep Tech Stack:\n" +
+            "* **Frontend Logic**: React JS (Virtual DOM optimization, lazy routing, hook structures), TypeScript interfaces.\n" +
+            "* **AI Alignment & RLHF**: Evaluated instruction-following boundaries, truthfulness audits, and factuality parameters for advanced LLMs.\n" +
+            "* **Programming**: Python scripting, SQLite database optimization, C++ memory compilation.";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'Technical Capability Matrix', similarity: 0.96 }];
+        } else {
+          responseText = "### Technical Telemetry Console:\n" +
+            "Systems are operating at peak efficiency. Ask about:\n" +
+            "* React bundle optimizations\n" +
+            "* ML model training workflows\n" +
+            "* SQLite query speeds (<5ms)";
+          mockTrace.chunks = [{ source: 'portfolioData.ts', title: 'Diagnostics matrix', similarity: 0.82 }];
+        }
       } else {
-        responseText = "### Greetings! I am Addy, Dheeraj's AI Twin.\n" +
-          "I am here to help you navigate Dheeraj's portfolio. You can ask me about:\n" +
-          "* **His Projects** (like the ML Sign Language recognizer)\n" +
-          "* **His Skills** (React, C++, Python, and AI Annotation/RLHF)\n" +
-          "* **His Certifications** (IBM Python, Google C, Coding Ninjas DSA)\n" +
-          "* **How to hire or contact him**\n" +
-          "\nFeel free to type a query or choose one of the quick starts below!";
-        mockTrace.chunks = [
-          { source: 'portfolioData.ts', title: 'General Info Matrix', similarity: 0.78 }
-        ];
+        // Creative mode
+        if (query.includes('project')) {
+          responseText = "### Cool things Dheeraj built:\n" +
+            "👋 He created an **Indian Sign Language translator** so people can communicate using gestures! He also developed a cute **Inventory dashboard** that runs on a desktop.\n" +
+            "\nCheck out [Projects](/projects) to see the details!";
+        } else if (query.includes('stack') || query.includes('skills')) {
+          responseText = "### Dheeraj's Tech Wizardry:\n" +
+            "He speaks **React JS** fluently, writes scripts in **Python**, builds clean software in **C++**, and annotates AI training data to make models like me smarter! 🚀";
+        } else {
+          responseText = "### Welcome to the Creative Hub!\n" +
+            "I'm Addy, your AI guide. Let's explore Dheeraj's creative portfolio pages:\n" +
+            "* Check out his career [Timeline](/timeline)!\n" +
+            "* Browse verified [Certificates](/certifications)!\n" +
+            "* Shoot him an email: [dheerajkumar7135227@gmail.com](mailto:dheerajkumar7135227@gmail.com)";
+        }
       }
 
       const assistantMsg: Message = {
@@ -354,7 +408,7 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
           className={`relative p-3.5 rounded-full shadow-2xl flex items-center justify-center border cursor-pointer transition-all duration-300 ${
             isOpen 
               ? 'bg-slate-800 border-slate-700 text-white' 
-              : 'bg-gradient-to-tr from-[#00E5FF]/95 to-indigo-600/95 text-white border-transparent shadow-[0_4px_25px_rgba(0,229,255,0.35)]'
+              : 'bg-gradient-to-tr from-[#00E5FF]/95 to-[#a855f7]/95 text-white border-transparent shadow-[0_4px_25px_rgba(0,229,255,0.35)]'
           }`}
         >
           {isOpen ? <X className="w-6 h-6" /> : <CustomBotIcon className="w-8 h-8" />}
@@ -374,49 +428,74 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className={`fixed bottom-24 right-6 w-[360px] md:w-[400px] h-[550px] z-50 rounded-2xl flex flex-col shadow-2xl border overflow-hidden backdrop-blur-xl transition-all duration-300 ${
               isDark 
-                ? 'bg-[#0a0a0c]/90 border-slate-800/80 text-slate-100 shadow-cyan-950/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]' 
+                ? 'bg-[#030014]/95 border-slate-800/80 text-slate-100 shadow-cyan-950/20 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]' 
                 : 'bg-white/95 border-slate-200/80 text-slate-900 shadow-slate-300/40 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.4)]'
             }`}
           >
             {/* Header */}
-            <div className={`p-4 flex items-center justify-between border-b ${
+            <div className={`p-4 flex flex-col gap-2.5 border-b ${
               isDark ? 'border-slate-800/80 bg-slate-950/40' : 'border-slate-200 bg-slate-50/50'
             }`}>
-              <div className="flex items-center gap-3">
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-indigo-500 flex items-center justify-center text-white font-bold shadow-md shadow-cyan-500/20 overflow-hidden">
-                    <CustomBotIcon className="w-10 h-10 scale-125" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-[#a855f7] flex items-center justify-center text-white font-bold shadow-md shadow-cyan-500/20 overflow-hidden">
+                      <CustomBotIcon className="w-10 h-10 scale-125" />
+                    </div>
+                    <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0a0a0c] animate-pulse" />
                   </div>
-                  <span className="absolute bottom-0 right-0 block h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-[#0a0a0c] animate-pulse" />
+                  <div>
+                    <h3 className="text-sm font-semibold tracking-wide text-cyan-400">Addy</h3>
+                    <p className="text-[10px] opacity-60 flex items-center gap-1">
+                      <span>Dheeraj's AI Twin Chatbot</span>
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-sm font-semibold tracking-wide text-cyan-400">Addy</h3>
-                  <p className="text-[10px] opacity-60 flex items-center gap-1">
-                    <span>Dheeraj's AI Twin Chatbot</span>
-                  </p>
-                </div>
-              </div>
 
-              <div className="flex items-center gap-1">
-                {messages.length > 0 && (
+                <div className="flex items-center gap-1">
+                  {messages.length > 1 && (
+                    <button
+                      onClick={resetChat}
+                      title="Reset Chat"
+                      className={`p-2 rounded-lg transition-colors cursor-pointer border-none bg-transparent ${
+                        isDark ? 'hover:bg-slate-850 text-slate-400 hover:text-white' : 'hover:bg-slate-150 text-slate-500 hover:text-slate-900'
+                      }`}
+                    >
+                      <RotateCcw className="w-4 h-4" />
+                    </button>
+                  )}
                   <button
-                    onClick={resetChat}
-                    title="Reset Chat"
+                    onClick={() => setIsOpen(false)}
                     className={`p-2 rounded-lg transition-colors cursor-pointer border-none bg-transparent ${
                       isDark ? 'hover:bg-slate-850 text-slate-400 hover:text-white' : 'hover:bg-slate-150 text-slate-500 hover:text-slate-900'
                     }`}
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <X className="w-4 h-4" />
                   </button>
-                )}
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className={`p-2 rounded-lg transition-colors cursor-pointer border-none bg-transparent ${
-                    isDark ? 'hover:bg-slate-850 text-slate-400 hover:text-white' : 'hover:bg-slate-150 text-slate-500 hover:text-slate-900'
-                  }`}
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                </div>
+              </div>
+
+              {/* Personality Selector Toggles */}
+              <div className="flex items-center justify-between border-t border-white/5 pt-2.5">
+                <span className="text-[8px] font-mono opacity-50 uppercase tracking-widest">AGENT MODE</span>
+                <div className="flex items-center gap-1">
+                  {(['recruiter', 'technical', 'creative'] as const).map((mode) => (
+                    <button
+                      key={mode}
+                      onClick={() => {
+                        setPersonality(mode);
+                        resetChat();
+                      }}
+                      className={`px-2 py-1 rounded-md text-[9px] font-mono tracking-wider transition-colors cursor-pointer border-none ${
+                        personality === mode 
+                          ? 'bg-[#a855f7]/20 text-[#c084fc] font-bold' 
+                          : isDark ? 'text-slate-500 hover:text-slate-300 bg-transparent' : 'text-slate-450 hover:text-slate-700 bg-transparent'
+                      }`}
+                    >
+                      {mode}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -471,13 +550,18 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
                         <div
                           className={`rounded-2xl px-3.5 py-2.5 shadow-sm max-w-[80%] ${
                             msg.role === 'user'
-                              ? 'bg-gradient-to-tr from-sky-600 to-indigo-600 text-white rounded-tr-none'
+                              ? 'bg-gradient-to-tr from-[#a855f7] to-indigo-600 text-white rounded-tr-none'
                               : isDark
                                 ? 'bg-slate-900/70 border border-slate-800/40 text-slate-100 rounded-tl-none'
                                 : 'bg-slate-100/80 border border-slate-200/60 text-slate-900 rounded-tl-none'
                           }`}
                         >
-                          <FormattedMessage text={msg.content} isDark={isDark} />
+                          {/* Use typewriter effect for the most recent model response */}
+                          {msg.role === 'model' && index === messages.length - 1 && isLoading === false ? (
+                            <TypewriterText text={msg.content} isDark={isDark} />
+                          ) : (
+                            <FormattedMessage text={msg.content} isDark={isDark} />
+                          )}
                         </div>
                         {msg.role === 'user' && (
                           <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center shrink-0 mt-0.5">
@@ -584,7 +668,7 @@ export default function Chatbot({ isDark }: { isDark: boolean }) {
                   disabled={!input.trim() || isLoading}
                   className={`p-2 rounded-xl flex items-center justify-center transition-colors cursor-pointer border-none ${
                     input.trim() && !isLoading
-                      ? 'bg-gradient-to-tr from-cyan-400 to-indigo-600 text-white shadow-md shadow-cyan-500/10'
+                      ? 'bg-gradient-to-tr from-cyan-400 to-[#a855f7] text-white shadow-md shadow-cyan-500/10'
                       : isDark
                         ? 'bg-slate-900 text-slate-600 border border-slate-800'
                         : 'bg-slate-100 text-slate-400 border border-slate-200'

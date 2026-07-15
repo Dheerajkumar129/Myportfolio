@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Linkedin, Github } from '../components/Icons';
 import SEO from '../components/SEO';
+import CardSpotlight from '../components/CardSpotlight';
 
 interface ContactProps {
   isDark: boolean;
@@ -47,7 +48,7 @@ export default function Contact({ isDark }: ContactProps) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Simulate secure terminal handshake logs exactly like Adarsh's portfolio
+  // Simulate secure terminal handshake logs
   useEffect(() => {
     if (status === 'encrypting') {
       setTerminalLogs(['[SYSTEM] Initializing secure socket handshake...']);
@@ -130,8 +131,8 @@ export default function Contact({ isDark }: ContactProps) {
           transition={{ duration: 0.6 }}
           className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] font-sans uppercase w-fit mb-6 ${
             isDark 
-              ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
-              : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
+              ? 'bg-[#a855f7]/15 border-[#a855f7]/30 text-[#c084fc]' 
+              : 'bg-[#a855f7]/10 border-[#a855f7]/20 text-[#a855f7]'
           }`}
         >
           <ShieldCheck className="w-3.5 h-3.5" />
@@ -185,13 +186,13 @@ export default function Contact({ isDark }: ContactProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-[#050505]/95 z-30 flex flex-col items-center justify-center p-8 text-center"
+                className="absolute inset-0 bg-[#030014]/95 z-30 flex flex-col items-center justify-center p-8 text-center"
               >
                 <div className="w-full max-w-md bg-black border border-white/10 rounded-2xl p-6 text-left font-mono text-xs">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-[#007AFF]">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-[#a855f7]">
                     <div className="flex items-center gap-2">
-                      <Terminal className="w-4 h-4" />
-                      <span className="font-bold tracking-wider text-sky-400">SECURE DISPATCH INITIALIZATION</span>
+                      <Terminal className="w-4 h-4 text-cyan-400 animate-pulse" />
+                      <span className="font-bold tracking-wider text-cyan-400">SECURE DISPATCH INITIALIZATION</span>
                     </div>
                     <Loader2 className="w-3.5 h-3.5 animate-spin" />
                   </div>
@@ -203,7 +204,7 @@ export default function Contact({ isDark }: ContactProps) {
                       </div>
                     ))}
                     {status === 'dispatching' && (
-                      <div className="animate-pulse text-[#007AFF] font-bold">
+                      <div className="animate-pulse text-[#a855f7] font-bold">
                         [SYSTEM] Redirecting payload to local mail client...
                       </div>
                     )}
@@ -213,10 +214,10 @@ export default function Contact({ isDark }: ContactProps) {
             )}
           </AnimatePresence>
 
-          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF] block mb-2">
+          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#a855f7] block mb-2">
             Secure Outpost
           </span>
-          <h2 className="text-xl font-bold font-sans tracking-tight mb-8">Send Operational Message</h2>
+          <h2 className="text-xl font-bold font-sans tracking-tight mb-8">Send Message</h2>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -230,7 +231,7 @@ export default function Contact({ isDark }: ContactProps) {
                   placeholder="e.g. Recruiters / Tech Leads"
                   value={formState.name}
                   onChange={e => setFormState({ ...formState, name: e.target.value })}
-                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
+                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#a855f7] bg-transparent ${
                     isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
                   }`}
                 />
@@ -245,7 +246,7 @@ export default function Contact({ isDark }: ContactProps) {
                   placeholder="e.g. contact@enterprise.com"
                   value={formState.email}
                   onChange={e => setFormState({ ...formState, email: e.target.value })}
-                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
+                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#a855f7] bg-transparent ${
                     isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
                   }`}
                 />
@@ -262,7 +263,7 @@ export default function Contact({ isDark }: ContactProps) {
                 placeholder="e.g. AI Annotation Contracts"
                 value={formState.subject}
                 onChange={e => setFormState({ ...formState, subject: e.target.value })}
-                className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
+                className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#a855f7] bg-transparent ${
                   isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
                 }`}
               />
@@ -278,7 +279,7 @@ export default function Contact({ isDark }: ContactProps) {
                 placeholder="Compose your outreach inquiry..."
                 value={formState.message}
                 onChange={e => setFormState({ ...formState, message: e.target.value })}
-                className={`w-full px-5 py-4 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent resize-none ${
+                className={`w-full px-5 py-4 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#a855f7] bg-transparent resize-none ${
                   isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
                 }`}
               />
@@ -319,15 +320,14 @@ export default function Contact({ isDark }: ContactProps) {
         
         {/* ACCESS COORDINATES (SIDEBAR) */}
         <div className="lg:col-span-5 space-y-8">
-          
-          <div 
+          <CardSpotlight 
             className={`p-8 rounded-[32px] border relative transition-all duration-300 group ${
               isDark 
-                ? 'bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] hover:border-[#007AFF]/35 shadow-md' 
-                : 'bg-white border-slate-200 hover:border-[#007AFF]/25 shadow-sm'
+                ? 'bg-neutral-900/30 border-white/5 hover:border-[#a855f7]/35 shadow-md' 
+                : 'bg-white border-slate-200 hover:border-[#a855f7]/25 shadow-sm'
             }`}
           >
-            <h2 className="text-base font-bold font-display mb-6 tracking-wide text-[#007AFF]">Direct Address Coordinates</h2>
+            <h2 className="text-base font-bold font-display mb-6 tracking-wide text-[#a855f7]">Direct Address Coordinates</h2>
             
             <div className="space-y-6">
               
@@ -337,7 +337,7 @@ export default function Contact({ isDark }: ContactProps) {
                   Direct Mail Endpoint
                 </span>
                 <div className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                  isDark ? 'bg-black/40 border-white/[0.08]' : 'bg-slate-50 border-slate-200'
                 }`}>
                   <span className={isDark ? 'text-white/80' : 'text-neutral-850'}>{coords.email}</span>
                   <button
@@ -365,15 +365,15 @@ export default function Contact({ isDark }: ContactProps) {
                   rel="noreferrer"
                   className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
                     isDark 
-                      ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
+                      ? 'bg-black/40 border-white/[0.08] hover:bg-white/5 hover:border-white/20 text-white/80 hover:text-white' 
                       : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Linkedin className="w-4 h-4 text-[#007AFF]" />
+                    <Linkedin className="w-4 h-4 text-[#a855f7]" />
                     <span>{coords.linkedin}</span>
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-white/40" />
+                  <ExternalLink className="w-3.5 h-3.5 text-white/45" />
                 </a>
               </div>
 
@@ -388,15 +388,15 @@ export default function Contact({ isDark }: ContactProps) {
                   rel="noreferrer"
                   className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
                     isDark 
-                      ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
+                      ? 'bg-black/40 border-white/[0.08] hover:bg-white/5 hover:border-white/20 text-white/80 hover:text-white' 
                       : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Github className="w-4 h-4 text-[#007AFF]" />
+                    <Github className="w-4 h-4 text-[#a855f7]" />
                     <span>{coords.github}</span>
                   </div>
-                  <ExternalLink className="w-3.5 h-3.5 text-white/40" />
+                  <ExternalLink className="w-3.5 h-3.5 text-white/45" />
                 </a>
               </div>
 
@@ -406,9 +406,9 @@ export default function Contact({ isDark }: ContactProps) {
                   Operational Location
                 </span>
                 <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
+                  isDark ? 'bg-black/40 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
                 }`}>
-                  <MapPin className="w-4 h-4 text-[#007AFF]" />
+                  <MapPin className="w-4 h-4 text-[#a855f7]" />
                   <span>{coords.location}</span>
                 </div>
               </div>
@@ -419,15 +419,15 @@ export default function Contact({ isDark }: ContactProps) {
                   Response Hours
                 </span>
                 <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
-                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
+                  isDark ? 'bg-black/40 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
                 }`}>
-                  <Clock className="w-4 h-4 text-[#007AFF]" />
+                  <Clock className="w-4 h-4 text-[#a855f7]" />
                   <span>{coords.hours}</span>
                 </div>
               </div>
 
             </div>
-          </div>
+          </CardSpotlight>
         </div>
 
       </div>

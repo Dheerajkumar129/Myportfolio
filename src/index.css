@@ -2,10 +2,10 @@
 
 @layer base {
   :root {
-    --color-bg: 5 5 12;
-    --color-primary: 99 102 241;
-    --color-accent: 139 92 246;
-    --color-cyan: 6 182 212;
+    --color-bg: 3 0 20; /* Deep Cybernetic Space #030014 */
+    --color-primary: 99 102 241; /* Cyber Indigo */
+    --color-accent: 219 39 119; /* Magenta Glow */
+    --color-cyan: 6 182 212; /* Neon Cyan */
     --color-text: 248 250 252;
     --color-text-muted: 148 163 184;
   }
@@ -22,9 +22,9 @@
   }
 
   body {
-    background: radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+    background: radial-gradient(circle at 50% -20%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 10% 40%, rgba(219, 39, 119, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 70%, rgba(6, 182, 212, 0.06) 0%, transparent 45%),
                 rgb(var(--color-bg));
     color: rgb(var(--color-text));
     font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -34,61 +34,100 @@
   }
 
   ::-webkit-scrollbar {
-    width: 8px;
+    width: 6px;
   }
   ::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.01);
+    background: rgba(3, 0, 20, 0.5);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
     border-radius: 9999px;
-    border: 2px solid rgb(var(--color-bg));
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.18);
   }
 }
 
 @layer components {
-  /* Apple Glassmorphism */
+  /* Apple Glassmorphism with slight metallic sheen */
   .apple-glass {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    background: rgba(255, 255, 255, 0.01);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   }
 
-  .apple-glass-interactive {
-    background: rgba(255, 255, 255, 0.02);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Interactive Spotlight Border Cards */
+  .spotlight-card {
+    position: relative;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.015);
+    overflow: hidden;
+    transition: background 0.3s, border-color 0.3s;
   }
 
-  .apple-glass-interactive:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 12px 40px 0 rgba(99, 102, 241, 0.15);
-    transform: translateY(-4px) scale(1.01);
+  .spotlight-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+      rgba(99, 102, 241, 0.06),
+      transparent 40%
+    );
+    z-index: 0;
+    pointer-events: none;
   }
 
-  /* Typography */
+  .spotlight-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    padding: 1px;
+    background: radial-gradient(
+      400px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+      rgba(255, 255, 255, 0.18),
+      transparent 40%
+    );
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  /* Typography Gradients */
   .gradient-text-apple {
-    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+    background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #64748b 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* CTAs & Buttons */
+  .text-glow-blue {
+    text-shadow: 0 0 20px rgba(0, 122, 255, 0.3);
+  }
+
+  /* Neon Glowing Elements */
+  .glow-cyan {
+    box-shadow: 0 0 20px 0 rgba(6, 182, 212, 0.25);
+  }
+
+  .glow-magenta {
+    box-shadow: 0 0 25px 0 rgba(219, 39, 119, 0.3);
+  }
+
+  /* Premium Buttons */
   .btn-apple-primary {
     position: relative;
-    padding: 0.75rem 1.5rem;
-    border-radius: 14px;
-    font-size: 0.875rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: #000;
     background: #ffffff;
@@ -105,21 +144,17 @@
 
   .btn-apple-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.35), 0 0 15px rgba(99, 102, 241, 0.2);
     background: #f8fafc;
   }
 
-  .btn-apple-primary:active {
-    transform: translateY(0);
-  }
-
   .btn-apple-secondary {
-    padding: 0.75rem 1.5rem;
-    border-radius: 14px;
-    font-size: 0.875rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 16px;
+    font-size: 0.85rem;
     font-weight: 600;
     color: #fff;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.03);
     backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
@@ -131,17 +166,9 @@
   }
 
   .btn-apple-secondary:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.07);
     border-color: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
-  }
-
-  /* Tags */
-  .tag-apple {
-    @apply px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    color: #cbd5e1;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 5px 15px rgba(255, 255, 255, 0.05);
   }
 }

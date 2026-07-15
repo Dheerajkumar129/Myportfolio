@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import type { HeroConfig, HomeCard } from '../types';
 import Hero from '../sections/Hero';
 import SEO from '../components/SEO';
-import { Award, Database, Cpu, Mail, Layers, ArrowRight } from 'lucide-react';
+import CardSpotlight from '../components/CardSpotlight';
+import { Award, Database, Cpu, Mail, Layers, ArrowRight, Terminal } from 'lucide-react';
 
 interface HomeProps {
   config: HeroConfig;
@@ -14,6 +15,15 @@ interface HomeProps {
 
 export default function Home({ config, homeCards = [], isDark }: HomeProps) {
   const [openFaqIdx, setOpenFaqIdx] = useState<number | null>(null);
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+
+  // Real-time ticking clock for premium telemetry card
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // Map icon strings to Lucide components
   const getCardIcon = (id: string) => {
@@ -22,6 +32,7 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
       case 'availability': return Award;
       case 'featured-stack': return Database;
       case 'quick-connect': return Mail;
+      case 'system-stats': return Terminal;
       default: return Layers;
     }
   };
@@ -109,15 +120,15 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
 
       {/* Premium Teaser Navigation Section */}
       <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-1000 ${
-        isDark ? 'bg-[#050505] border-white/5' : 'bg-slate-50 border-black/5'
+        isDark ? 'bg-[#030014] border-white/5' : 'bg-slate-50 border-black/5'
       }`}>
         {/* Soft atmospheric gradient */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full filter blur-[150px] opacity-10 bg-[#007AFF]/20 pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] rounded-full filter blur-[150px] opacity-10 bg-[#9333EA]/20 pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
           {/* Section Heading */}
           <div className="mb-12 text-left">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#a855f7] block mb-2">
               System Console
             </span>
             <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight">
@@ -131,21 +142,34 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {homeCards.map((card) => {
+              {[
+                ...homeCards,
+                {
+                  id: 'system-stats',
+                  badge: 'Telemetry Active',
+                  title: 'Console Logs',
+                  subtitle: 'Real-time Status',
+                  description: 'Real-time clock tracking safety checks, instruction-following logic weights, and localized connection latency parameters.',
+                  buttonText: 'Inspect System',
+                  extra: []
+                }
+              ].map((card) => {
                 const Icon = getCardIcon(card.id);
+                const isStats = card.id === 'system-stats';
+
                 return (
                   <motion.div
                     key={card.id}
                     variants={cardVariants}
-                    whileHover={{ y: -6, scale: 1.01 }}
+                    whileHover={{ y: -6, scale: 1.015 }}
                     className="h-full"
                   >
-                    <div
-                      className={`h-full flex flex-col justify-between p-6 md:p-7 rounded-[30px] border transition-all duration-500 bg-gradient-to-br hover:border-[#007AFF]/30 ${
+                    <CardSpotlight
+                      className={`h-full flex flex-col justify-between p-7 rounded-[30px] border transition-all duration-500 ${
                         isDark 
-                          ? 'bg-neutral-900/40 border-white/5 hover:shadow-[0_20px_40px_rgba(0,122,255,0.08)]' 
+                          ? 'bg-neutral-900/40 border-white/5 hover:shadow-[0_20px_40px_rgba(147,51,234,0.08)]' 
                           : 'bg-white border-neutral-200/60 hover:shadow-[0_15px_30px_rgba(0,0,0,0.03)]'
                       } group cursor-pointer`}
                     >
@@ -153,24 +177,50 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
                         <div className="flex items-center justify-between mb-6">
                           <div className={`p-3 rounded-2xl ${
                             isDark ? 'bg-white/5 text-white/80' : 'bg-slate-100 text-neutral-800'
-                          } transition-colors group-hover:bg-[#007AFF] group-hover:text-white`}>
+                          } transition-colors group-hover:bg-[#a855f7] group-hover:text-white`}>
                             <Icon className="w-5 h-5" />
                           </div>
-                          <span className={`text-[10px] uppercase font-mono tracking-widest ${
+                          <span className={`text-[10px] uppercase font-mono tracking-widest flex items-center gap-1.5 ${
                             isDark ? 'text-slate-400' : 'text-slate-600'
                           }`}>
+                            {isStats && <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}
                             {card.badge}
                           </span>
                         </div>
 
-                        <h3 className="text-lg font-sans font-semibold tracking-tight mb-2 group-hover:text-[#007AFF] transition-colors duration-300">
+                        <h3 className="text-lg font-sans font-semibold tracking-tight mb-2 group-hover:text-[#a855f7] transition-colors duration-300">
                           {card.title}
                         </h3>
-                        <p className={`text-xs font-light leading-relaxed mb-6 ${
-                          isDark ? 'text-slate-300' : 'text-slate-600'
-                        }`}>
-                          {card.description}
-                        </p>
+
+                        {isStats ? (
+                          // Real-time ticking statistics inside the custom telemetry bento card
+                          <div className="my-5 space-y-3 font-mono text-[11px] text-left">
+                            <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                              isDark ? 'bg-black/40 border-white/5' : 'bg-slate-50 border-slate-200'
+                            }`}>
+                              <span className="opacity-60">LOCAL TIME</span>
+                              <span className="font-semibold text-cyan-400">{time}</span>
+                            </div>
+                            <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                              isDark ? 'bg-black/40 border-white/5' : 'bg-slate-50 border-slate-200'
+                            }`}>
+                              <span className="opacity-60">PROMPT ACCURACY</span>
+                              <span className="font-semibold text-[#a855f7]">99.85%</span>
+                            </div>
+                            <div className={`p-3 rounded-xl border flex items-center justify-between ${
+                              isDark ? 'bg-black/40 border-white/5' : 'bg-slate-50 border-slate-200'
+                            }`}>
+                              <span className="opacity-60">RLHF DELTA</span>
+                              <span className="font-semibold text-emerald-400">+1.428</span>
+                            </div>
+                          </div>
+                        ) : (
+                          <p className={`text-xs font-light leading-relaxed mb-6 ${
+                            isDark ? 'text-slate-300' : 'text-slate-600'
+                          }`}>
+                            {card.description}
+                          </p>
+                        )}
                       </div>
 
                       {card.id === 'ai-assistant' ? (
@@ -179,22 +229,31 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
                             e.stopPropagation();
                             window.dispatchEvent(new CustomEvent('open-chatbot'));
                           }}
-                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto hover:text-[#007AFF]/80 transition-colors border-none bg-transparent cursor-pointer"
+                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#a855f7] self-start mt-auto hover:text-[#a855f7]/80 transition-colors border-none bg-transparent cursor-pointer"
                         >
                           <span>{card.buttonText || 'Explore'}</span>
                           <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
                         </button>
+                      ) : isStats ? (
+                        <Link
+                          to="/skills"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#a855f7] self-start mt-auto hover:text-[#a855f7]/80 transition-colors"
+                        >
+                          <span>{card.buttonText}</span>
+                          <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
+                        </Link>
                       ) : (
                         <Link
                           to={card.id === 'availability' ? '/timeline' : card.id === 'featured-stack' ? '/skills' : '/contact'}
                           onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#007AFF] self-start mt-auto hover:text-[#007AFF]/80 transition-colors"
+                          className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#a855f7] self-start mt-auto hover:text-[#a855f7]/80 transition-colors"
                         >
                           <span>{card.buttonText || 'Explore'}</span>
                           <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
                         </Link>
                       )}
-                    </div>
+                    </CardSpotlight>
                   </motion.div>
                 );
               })}
@@ -209,11 +268,11 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
 
       {/* FAQ Accordion Section for SEO & LLM Scraping */}
       <section className={`py-16 md:py-24 border-t relative overflow-hidden transition-colors duration-1000 ${
-        isDark ? 'bg-[#050505] border-white/5' : 'bg-slate-50 border-black/5'
+        isDark ? 'bg-[#030014] border-white/5' : 'bg-slate-50 border-black/5'
       }`}>
         <div className="max-w-4xl mx-auto px-6 md:px-12 relative z-10 w-full text-left">
           <div className="mb-12">
-            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#007AFF] block mb-2">
+            <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#a855f7] block mb-2">
               Common Inquiries
             </span>
             <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight">
@@ -240,7 +299,7 @@ export default function Home({ config, homeCards = [], isDark }: HomeProps) {
                     aria-controls={`faq-answer-${idx}`}
                   >
                     <span>{faq.q}</span>
-                    <span className={`text-[#007AFF] transform transition-transform duration-300 font-mono ${
+                    <span className={`text-[#a855f7] transform transition-transform duration-300 font-mono ${
                       isOpen ? 'rotate-45' : ''
                     }`}>
                       +

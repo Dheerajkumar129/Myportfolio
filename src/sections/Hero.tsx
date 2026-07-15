@@ -7,6 +7,7 @@ import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import type { HeroConfig } from '../types';
 import AnimatedOrb from '../components/AnimatedOrb';
+import ParticleMesh from '../components/ParticleMesh';
 import { ArrowRight } from 'lucide-react';
 
 interface HeroProps {
@@ -52,6 +53,9 @@ export default function Hero({ config, isDark }: HeroProps) {
       
       {/* High-Luxury Decorative Ambient Vignette */}
       <div className="absolute top-1/4 left-1/4 w-[350px] h-[350px] rounded-full filter blur-[150px] opacity-10 bg-indigo-500/50 pointer-events-none" />
+
+      {/* Interactive Particle Node Network */}
+      <ParticleMesh />
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10 w-full">
         {/* Split Hero Layout */}
