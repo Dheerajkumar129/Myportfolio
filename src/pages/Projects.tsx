@@ -18,10 +18,22 @@ export default function Projects({ projects, isDark }: ProjectsPageProps) {
   // Categories list
   const categories: ProjectCategory[] = ['All', 'AI / ML', 'Desktop App', 'Systems', 'Web App'];
 
-  // Filter projects based on active category
-  const filteredProjects = activeCategory === 'All' 
-    ? projects 
-    : projects.filter(p => p.priority && p.status && p.technologies && (p.id.includes(activeCategory.toLowerCase()) || p.technologies.some(t => t.includes(activeCategory)) || p.title.toLowerCase().includes(activeCategory.toLowerCase()) || (activeCategory === 'AI / ML' && p.technologies.some(t => ['CNN', 'LSTM', 'Mediapipe', 'ML'].includes(t)))));
+  const filteredProjects = projects.filter(p => {
+    if (activeCategory === 'All') return true;
+    if (activeCategory === 'AI / ML') {
+      return p.technologies.some(t => ['CNN', 'LSTM', 'Mediapipe', 'Python', 'NLP', 'Speech Recognition'].includes(t)) && p.id !== 'inventory-management';
+    }
+    if (activeCategory === 'Desktop App') {
+      return p.technologies.some(t => ['Tkinter', 'SQLite'].includes(t)) || p.id === 'inventory-management';
+    }
+    if (activeCategory === 'Systems') {
+      return p.technologies.some(t => ['C++', 'OOP', 'Object-Oriented Programming'].includes(t)) || p.id === 'payroll-management';
+    }
+    if (activeCategory === 'Web App') {
+      return p.technologies.some(t => ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap', 'React'].includes(t)) || p.id === 'hospital-portal';
+    }
+    return false;
+  });
 
   // Identify featured project (Spotlight card)
   const featuredProject = projects.find(p => p.featured) || projects[0];
@@ -94,7 +106,7 @@ export default function Projects({ projects, isDark }: ProjectsPageProps) {
             } italic font-serif font-medium`}>Intelligent Systems</span>
           </h1>
           <p className={`text-base md:text-lg font-light leading-relaxed ${
-            isDark ? 'text-slate-300' : 'text-slate-655'
+            isDark ? 'text-slate-300' : 'text-slate-600'
           }`}>
             An asymmetrical curation of machine learning recognition systems, CRUD desktop software, and responsive web portals.
           </p>

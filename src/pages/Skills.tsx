@@ -158,7 +158,7 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
           className={`text-base md:text-lg font-light max-w-2xl leading-relaxed ${
-            isDark ? 'text-slate-300' : 'text-slate-655'
+            isDark ? 'text-slate-300' : 'text-slate-600'
           }`}>
           Applying advanced output evaluations and prompt optimizations to AI model training, while building clean modular web interfaces.
         </motion.p>
@@ -212,7 +212,7 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
                             {cat.title}
                           </h3>
                         </div>
-                        <span className={`text-[9px] font-mono tracking-widest ${isDark ? 'text-slate-300' : 'text-slate-655'}`}>
+                        <span className={`text-[9px] font-mono tracking-widest ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                           {(cat.skills || []).length} Units
                         </span>
                       </div>
@@ -290,7 +290,7 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
                       </h3>
                     </div>
                     <p className={`text-xs font-light leading-relaxed mb-6 ${
-                      isDark ? 'text-slate-200' : 'text-slate-705'
+                      isDark ? 'text-slate-200' : 'text-slate-700'
                     }`}>
                       {strength.desc}
                     </p>
@@ -340,7 +340,7 @@ export default function Skills({ categories, strengths, isDark }: SkillsProps) {
                     {p.title}
                   </h3>
                 </div>
-                <p className={`text-xs font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-605'}`}>
+                <p className={`text-xs font-light leading-relaxed ${isDark ? 'text-slate-300' : 'text-slate-600'}`}>
                   {p.desc}
                 </p>
               </div>

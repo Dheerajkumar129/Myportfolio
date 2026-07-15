@@ -134,9 +134,15 @@ export default function Timeline({ timeline = [] }: TimelineProps) {
                     {entry.title}
                   </h3>
                   
-                  <div className="text-[10px] md:text-xs text-slate-400 mb-4 flex items-center gap-2">
-                    <User className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Author: Dheeraj Kumar &lt;{entry.subtitle}&gt;</span>
+                  <div className="text-[10px] md:text-xs text-slate-400 mb-4 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                    <div className="flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-cyan-400" />
+                      <span>Author: Dheeraj Kumar &lt;dheerajkumar7135227@gmail.com&gt;</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-emerald-400">@</span>
+                      <span className="text-slate-300">{entry.subtitle}</span>
+                    </div>
                   </div>
 
                   <p className="text-xs leading-relaxed text-slate-350 font-sans font-light mb-6 select-text">

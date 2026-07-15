@@ -158,7 +158,7 @@ export default function Contact({ isDark }: ContactProps) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
           className={`text-base md:text-lg font-light leading-relaxed ${
-            isDark ? 'text-slate-300' : 'text-slate-655'
+            isDark ? 'text-slate-300' : 'text-slate-600'
           }`}
         >
           Establish encrypted communication lines for AI training contracts, UI opportunities, or general queries.
@@ -333,7 +333,7 @@ export default function Contact({ isDark }: ContactProps) {
               
               {/* Email Copier */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Direct Mail Endpoint
                 </span>
                 <div className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs ${
@@ -356,7 +356,7 @@ export default function Contact({ isDark }: ContactProps) {
 
               {/* LinkedIn Gateway */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Professional Network
                 </span>
                 <a
@@ -379,7 +379,7 @@ export default function Contact({ isDark }: ContactProps) {
 
               {/* GitHub Gateway */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Source Repository
                 </span>
                 <a
@@ -402,7 +402,7 @@ export default function Contact({ isDark }: ContactProps) {
 
               {/* Operating Location */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Operational Location
                 </span>
                 <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
@@ -415,7 +415,7 @@ export default function Contact({ isDark }: ContactProps) {
 
               {/* Availability Hours */}
               <div className="flex flex-col gap-1.5">
-                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
                   Response Hours
                 </span>
                 <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${

@@ -117,7 +117,7 @@ export default function Navbar({ isDark, toggleTheme }: NavbarProps) {
               className={`p-2.5 rounded-full border cursor-pointer focus:outline-none ${
                 isDark 
                   ? 'bg-neutral-950 border-neutral-800 text-slate-300 hover:text-white' 
-                  : 'bg-slate-100 border-slate-200 text-slate-605'
+                  : 'bg-slate-100 border-slate-200 text-slate-600'
               }`}
               aria-label="Open primary layout menu"
             >
