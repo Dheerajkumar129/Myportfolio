@@ -3,7 +3,7 @@
  * React + TypeScript + TailwindCSS + Framer Motion
  */
 
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { profileData } from './data/portfolioData';
 import Navbar from './components/Navbar';
@@ -60,13 +60,13 @@ function AnimatedRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <main className="flex-1">
           <AnimatedRoutes />
         </main>
       </div>
-    </BrowserRouter>
+    </HashRouter>
   );
 }
