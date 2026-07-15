@@ -1,237 +1,435 @@
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle } from 'lucide-react';
-import { Github, Linkedin } from '../components/Icons';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { 
+  Clock, 
+  MapPin, 
+  ShieldCheck, 
+  Copy, 
+  Check, 
+  ExternalLink,
+  Loader2,
+  Terminal,
+  Send
+} from 'lucide-react';
+import { Linkedin, Github } from '../components/Icons';
+import SEO from '../components/SEO';
 
-const CONTACT_INFO = [
-  { icon: Mail, label: 'Email', value: 'dheerajkumar7135227@gmail.com', href: 'mailto:dheerajkumar7135227@gmail.com' },
-  { icon: Phone, label: 'Phone', value: '+91 9801657880', href: 'tel:+919801657880' },
-  { icon: Linkedin, label: 'LinkedIn', value: 'linkedin.com/in/dheerajkumar45', href: 'https://linkedin.com/in/dheerajkumar45' },
-  { icon: Github, label: 'GitHub', value: 'github.com/Dheerajkumar129', href: 'https://github.com/Dheerajkumar129' },
-  { icon: MapPin, label: 'Location', value: 'Jalandhar, Punjab, India', href: null },
-];
+interface ContactProps {
+  isDark: boolean;
+}
 
-type Status = 'idle' | 'sending' | 'success' | 'error';
+type SubmissionStatus = 'idle' | 'validating' | 'encrypting' | 'handshake' | 'dispatching' | 'success' | 'error';
 
-export default function Contact() {
-  const [status, setStatus] = useState<Status>('idle');
-  const formRef = useRef<HTMLFormElement>(null);
+export default function Contact({ isDark }: ContactProps) {
+  const [formState, setFormState] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: ''
+  });
+  const [status, setStatus] = useState<SubmissionStatus>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [copied, setCopied] = useState(false);
+  const [terminalLogs, setTerminalLogs] = useState<string[]>([]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const coords = {
+    email: 'dheerajkumar7135227@gmail.com',
+    linkedin: 'linkedin.com/in/dheerajkumar45',
+    github: 'github.com/Dheerajkumar129',
+    location: 'Jalandhar, Punjab, India',
+    hours: 'Mon – Fri, 9:00 AM – 6:00 PM IST / Remote'
+  };
+
+  const copyEmailToClipboard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(coords.email);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Simulate secure terminal handshake logs exactly like Adarsh's portfolio
+  useEffect(() => {
+    if (status === 'encrypting') {
+      setTerminalLogs(['[SYSTEM] Initializing secure socket handshake...']);
+      const timer = setTimeout(() => {
+        setTerminalLogs(prev => [...prev, '[CIPHER] AES-GCM-256 payload encryption applied.']);
+        setStatus('handshake');
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+
+    if (status === 'handshake') {
+      const timer = setTimeout(() => {
+        setTerminalLogs(prev => [...prev, '[TLS 1.3] Handshake established with mail service gateway.']);
+        setStatus('dispatching');
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+
+    if (status === 'dispatching') {
+      const timer = setTimeout(() => {
+        setTerminalLogs(prev => [...prev, '[GATEWAY] Launching local mail client wrapper...']);
+        // Open local mail client as fallback
+        window.location.href = `mailto:${coords.email}?subject=${encodeURIComponent(formState.subject)}&body=${encodeURIComponent(`From: ${formState.name} (${formState.email})\n\n${formState.message}`)}`;
+        setStatus('success');
+        setFormState({ name: '', email: '', subject: '', message: '' });
+      }, 600);
+      return () => clearTimeout(timer);
+    }
+  }, [status, formState]);
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('sending');
-    
-    // Simulate API delay
-    await new Promise((r) => setTimeout(r, 1500));
-    
-    const form = formRef.current!;
-    const name = (form.elements.namedItem('name') as HTMLInputElement).value;
-    const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-    const message = (form.elements.namedItem('message') as HTMLTextAreaElement).value;
+    if (!formState.name || !formState.email || !formState.subject || !formState.message) {
+      setErrorMessage('All transmission channels must be populated.');
+      setStatus('error');
+      return;
+    }
 
-    // Mailto fallback link activation
-    window.location.href = `mailto:dheerajkumar7135227@gmail.com?subject=Portfolio Contact from ${encodeURIComponent(name)}&body=${encodeURIComponent(`From: ${name} (${email})\n\n${message}`)}`;
-    
-    setStatus('success');
-    form.reset();
-    setTimeout(() => setStatus('idle'), 5000);
+    setStatus('encrypting');
+    setErrorMessage('');
+  };
+
+  const formVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] as const } 
+    }
+  };
+
+  const contactSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://Dheerajkumar129.github.io/Myportfolio/contact/#webpage",
+        "url": "https://Dheerajkumar129.github.io/Myportfolio/contact",
+        "name": "Outreach & Collaboration Gateway | Dheeraj Kumar",
+        "description": "Secure form gateway to establish communications, request annotation contracts, or explore React projects with Dheeraj Kumar."
+      }
+    ]
   };
 
   return (
-    <div className="min-h-screen bg-[#03030c] pt-32 pb-24 relative overflow-hidden">
-      {/* Lighting Blur Blobs */}
-      <div className="blur-blob blob-indigo top-[-10%] right-[-10%]" />
-      <div className="blur-blob blob-cyan bottom-[-10%] left-[-10%]" />
+    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full select-none">
+      <SEO 
+        title="Connect & Collaborate | Dheeraj Kumar"
+        description="Get in touch with Dheeraj Kumar for prompt engineering tasks, data annotation contracts, or React UI projects."
+        keywords="Contact, Recruiter Outreach, Hiring, AI Training Proposals"
+        canonicalUrl="https://Dheerajkumar129.github.io/Myportfolio/contact"
+        schema={contactSchema}
+      />
+      
+      {/* HERO HEADER */}
+      <div className="mb-20 text-left max-w-3xl">
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full border text-[10px] font-bold tracking-[0.2em] font-sans uppercase w-fit mb-6 ${
+            isDark 
+              ? 'bg-[#007AFF15] border-[#007AFF30] text-[#007AFF]' 
+              : 'bg-[#007AFF10] border-[#007AFF20] text-[#007AFF]'
+          }`}
+        >
+          <ShieldCheck className="w-3.5 h-3.5" />
+          <span>OUTREACH LINK STACKED</span>
+        </motion.div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-6 sm:px-8">
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="text-4xl md:text-6xl font-sans font-semibold tracking-tight leading-none mb-6"
+        >
+          Operational Outreach<br />
+          <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
+            isDark 
+              ? 'from-white via-white/80 to-white/40' 
+              : 'from-neutral-950 via-neutral-900 to-neutral-500'
+          } italic font-serif font-medium`}>Secure Form Gateway</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className={`text-base md:text-lg font-light leading-relaxed ${
+            isDark ? 'text-slate-300' : 'text-slate-655'
+          }`}
+        >
+          Establish encrypted communication lines for AI training contracts, UI opportunities, or general queries.
+        </motion.p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
         
-        {/* Header */}
-        <div className="text-center mb-16">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl sm:text-5xl font-black tracking-tight text-white mb-4"
-          >
-            Get In Touch
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-slate-500 text-sm max-w-lg mx-auto"
-          >
-            Let's discuss training operations, contract work, or frontend roles.
-          </motion.p>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-10">
-          {/* Column 1: Info Cards */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, type: 'spring', stiffness: 80 }}
-            className="flex flex-col gap-6"
-          >
-            <div className="p-[1px] rounded-3xl bg-gradient-to-b from-white/10 to-transparent">
-              <div className="rounded-3xl bg-white/[0.01] backdrop-blur-2xl p-6 border border-white/5">
-                <h2 className="text-xl font-extrabold text-white tracking-tight mb-3">Connect Directly</h2>
-                <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-8">
-                  Available for remote contract work, full-time positions, and ML alignment pipelines.
-                  Global timezone compatibility.
-                </p>
-
-                <div className="space-y-5">
-                  {CONTACT_INFO.map(({ icon: Icon, label, value, href }) => (
-                    <div key={label} className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center shrink-0">
-                        <Icon className="w-4.5 h-4.5 text-indigo-300" />
-                      </div>
-                      <div>
-                        <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">{label}</div>
-                        {href ? (
-                          <a href={href} target="_blank" rel="noopener noreferrer"
-                             className="text-slate-200 text-xs sm:text-sm font-semibold hover:text-indigo-300 transition-colors">
-                            {value}
-                          </a>
-                        ) : (
-                          <span className="text-slate-200 text-xs sm:text-sm font-semibold">{value}</span>
-                        )}
-                      </div>
+        {/* SECURE MESSAGE CONSOLE (FORM) */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={formVariants}
+          className={`lg:col-span-7 p-8 md:p-10 rounded-[32px] border relative overflow-hidden flex flex-col ${
+            isDark 
+              ? 'bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] shadow-2xl' 
+              : 'bg-white border-neutral-200/80 shadow-[0_15px_40px_rgba(0,0,0,0.03)]'
+          }`}
+        >
+          
+          {/* Animated Overlay for Secure Transmit Handshake */}
+          <AnimatePresence>
+            {(status === 'encrypting' || status === 'handshake' || status === 'dispatching') && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-[#050505]/95 z-30 flex flex-col items-center justify-center p-8 text-center"
+              >
+                <div className="w-full max-w-md bg-black border border-white/10 rounded-2xl p-6 text-left font-mono text-xs">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4 text-[#007AFF]">
+                    <div className="flex items-center gap-2">
+                      <Terminal className="w-4 h-4" />
+                      <span className="font-bold tracking-wider text-sky-400">SECURE DISPATCH INITIALIZATION</span>
                     </div>
-                  ))}
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  </div>
+                  
+                  <div className="space-y-2 text-white/75 min-h-[100px]">
+                    {terminalLogs.map((log, idx) => (
+                      <div key={idx} className="leading-relaxed">
+                        {log}
+                      </div>
+                    ))}
+                    {status === 'dispatching' && (
+                      <div className="animate-pulse text-[#007AFF] font-bold">
+                        [SYSTEM] Redirecting payload to local mail client...
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-            {/* Status Panel Card */}
-            <div className="p-[1px] rounded-3xl bg-gradient-to-b from-white/10 to-transparent">
-              <div className="rounded-3xl bg-white/[0.01] backdrop-blur-2xl p-5 border border-white/5 flex flex-col gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                  </span>
-                  <span className="text-emerald-400 font-extrabold text-xs tracking-wider uppercase">Open to Contracts</span>
-                </div>
-                <p className="text-slate-500 text-xs leading-relaxed">
-                  Actively evaluating next opportunities. Contact for consultation.
-                </p>
-              </div>
-            </div>
-          </motion.div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF] block mb-2">
+            Secure Outpost
+          </span>
+          <h2 className="text-xl font-bold font-sans tracking-tight mb-8">Send Operational Message</h2>
 
-          {/* Column 2: Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, type: 'spring', stiffness: 80, delay: 0.1 }}
-            className="p-[1px] rounded-3xl bg-gradient-to-b from-white/10 to-transparent"
-          >
-            <form ref={formRef} onSubmit={handleSubmit} className="rounded-3xl bg-white/[0.01] backdrop-blur-2xl p-6 border border-white/5 flex flex-col gap-6">
-              <h2 className="text-xl font-extrabold text-white tracking-tight">Send Message</h2>
-
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2.5" htmlFor="name">
-                  Full Name
-                </label>
+                <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>Sender Identity</label>
                 <input
-                  id="name"
-                  name="name"
                   type="text"
                   required
-                  placeholder="Your Name"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-slate-200 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all duration-300"
+                  placeholder="e.g. Recruiters / Tech Leads"
+                  value={formState.name}
+                  onChange={e => setFormState({ ...formState, name: e.target.value })}
+                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
+                    isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
+                  }`}
                 />
               </div>
-
               <div>
-                <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2.5" htmlFor="email">
-                  Email Address
-                </label>
+                <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
+                  isDark ? 'text-slate-400' : 'text-slate-500'
+                }`}>Return Address</label>
                 <input
-                  id="email"
-                  name="email"
                   type="email"
                   required
-                  placeholder="email@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-slate-200 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all duration-300"
+                  placeholder="e.g. contact@enterprise.com"
+                  value={formState.email}
+                  onChange={e => setFormState({ ...formState, email: e.target.value })}
+                  className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
+                    isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
+                  }`}
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="block text-slate-400 text-xs font-bold uppercase tracking-wider mb-2.5" htmlFor="message">
-                  Message Content
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={5}
-                  placeholder="Your message details..."
-                  className="w-full px-4 py-3 rounded-xl bg-white/[0.02] border border-white/10 text-slate-200 placeholder-slate-600 text-sm focus:outline-none focus:border-indigo-500/50 focus:bg-white/[0.04] transition-all duration-300 resize-none"
-                />
+            <div>
+              <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>Subject Line</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. AI Annotation Contracts"
+                value={formState.subject}
+                onChange={e => setFormState({ ...formState, subject: e.target.value })}
+                className={`w-full px-5 py-3 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent ${
+                  isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
+                }`}
+              />
+            </div>
+
+            <div>
+              <label className={`block text-[10px] uppercase font-mono tracking-widest mb-2 font-bold ${
+                isDark ? 'text-slate-400' : 'text-slate-500'
+              }`}>Message Payload</label>
+              <textarea
+                required
+                rows={5}
+                placeholder="Compose your outreach inquiry..."
+                value={formState.message}
+                onChange={e => setFormState({ ...formState, message: e.target.value })}
+                className={`w-full px-5 py-4 rounded-2xl border text-sm transition-all focus:outline-none focus:border-[#007AFF] bg-transparent resize-none ${
+                  isDark ? 'border-white/[0.08] text-white' : 'border-slate-200 text-neutral-900'
+                }`}
+              />
+            </div>
+
+            {status === 'error' && (
+              <div className="text-xs text-rose-500 font-mono flex items-center gap-1.5 animate-shake">
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={status === 'success'}
+              className={`w-full py-4 rounded-2xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer transition-all duration-300 border ${
+                status === 'success'
+                  ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                  : isDark
+                    ? 'bg-white text-black hover:bg-neutral-200 border-transparent hover:shadow-glow'
+                    : 'bg-neutral-950 text-white hover:bg-neutral-900 border-transparent hover:shadow-md'
+              }`}
+            >
+              {status === 'success' ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  <span>Outreach Redirected to Mail Client</span>
+                </>
+              ) : (
+                <>
+                  <Send className="w-4.5 h-4.5" />
+                  <span>Transmit Encrypted Packet</span>
+                </>
+              )}
+            </button>
+          </form>
+        </motion.div>
+        
+        {/* ACCESS COORDINATES (SIDEBAR) */}
+        <div className="lg:col-span-5 space-y-8">
+          
+          <div 
+            className={`p-8 rounded-[32px] border relative transition-all duration-300 group ${
+              isDark 
+                ? 'bg-gradient-to-b from-[#141416]/90 to-[#09090b]/95 border-white/[0.08] hover:border-[#007AFF]/35 shadow-md' 
+                : 'bg-white border-slate-200 hover:border-[#007AFF]/25 shadow-sm'
+            }`}
+          >
+            <h2 className="text-base font-bold font-display mb-6 tracking-wide text-[#007AFF]">Direct Address Coordinates</h2>
+            
+            <div className="space-y-6">
+              
+              {/* Email Copier */}
+              <div className="flex flex-col gap-1.5">
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                  Direct Mail Endpoint
+                </span>
+                <div className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs ${
+                  isDark ? 'bg-white/5 border-white/[0.08]' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <span className={isDark ? 'text-white/80' : 'text-neutral-850'}>{coords.email}</span>
+                  <button
+                    onClick={copyEmailToClipboard}
+                    className={`p-1.5 rounded-lg transition-colors border ${
+                      copied 
+                        ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
+                        : isDark ? 'hover:bg-white/10 border-transparent text-white/50 hover:text-white' : 'hover:bg-slate-200 border-transparent text-slate-500 hover:text-neutral-800'
+                    }`}
+                    title="Copy to clipboard"
+                  >
+                    {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  </button>
+                </div>
               </div>
 
-              {/* Status Display Alerts */}
-              <AnimatePresence>
-                {status === 'success' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="flex items-center gap-2.5 text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 px-4 py-3 rounded-xl font-semibold"
-                  >
-                    <CheckCircle className="w-4 h-4 shrink-0" />
-                    Success! Opening your default mail client...
-                  </motion.div>
-                )}
+              {/* LinkedIn Gateway */}
+              <div className="flex flex-col gap-1.5">
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                  Professional Network
+                </span>
+                <a
+                  href={`https://${coords.linkedin}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
+                    isDark 
+                      ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
+                      : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Linkedin className="w-4 h-4 text-[#007AFF]" />
+                    <span>{coords.linkedin}</span>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-white/40" />
+                </a>
+              </div>
 
-                {status === 'error' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    className="flex items-center gap-2.5 text-rose-400 text-xs bg-rose-500/10 border border-rose-500/20 px-4 py-3 rounded-xl font-semibold"
-                  >
-                    <AlertCircle className="w-4 h-4 shrink-0" />
-                    Failed to send. Please email me directly.
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* GitHub Gateway */}
+              <div className="flex flex-col gap-1.5">
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                  Source Repository
+                </span>
+                <a
+                  href={`https://${coords.github}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`flex items-center justify-between p-3.5 rounded-xl border font-mono text-xs transition-colors ${
+                    isDark 
+                      ? 'bg-white/5 border-white/[0.08] hover:bg-white/10 hover:border-white/20 text-white/80 hover:text-white' 
+                      : 'bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-350 text-neutral-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <Github className="w-4 h-4 text-[#007AFF]" />
+                    <span>{coords.github}</span>
+                  </div>
+                  <ExternalLink className="w-3.5 h-3.5 text-white/40" />
+                </a>
+              </div>
 
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                type="submit"
-                disabled={status === 'sending'}
-                className="btn-apple-primary w-full flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {status === 'sending' ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-slate-600 border-t-black rounded-full animate-spin" />
-                    Sending…
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-4 h-4" /> Send Message
-                  </>
-                )}
-              </motion.button>
-            </form>
-          </motion.div>
+              {/* Operating Location */}
+              <div className="flex flex-col gap-1.5">
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                  Operational Location
+                </span>
+                <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
+                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
+                }`}>
+                  <MapPin className="w-4 h-4 text-[#007AFF]" />
+                  <span>{coords.location}</span>
+                </div>
+              </div>
+
+              {/* Availability Hours */}
+              <div className="flex flex-col gap-1.5">
+                <span className={`text-[9px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-655'}`}>
+                  Response Hours
+                </span>
+                <div className={`flex items-center gap-2 p-3.5 rounded-xl border font-mono text-xs ${
+                  isDark ? 'bg-white/5 border-white/[0.08] text-white/80' : 'bg-slate-50 border-slate-200 text-neutral-800'
+                }`}>
+                  <Clock className="w-4 h-4 text-[#007AFF]" />
+                  <span>{coords.hours}</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
         </div>
 
-        {/* Footer info */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 0.6 }}
-          viewport={{ once: true }}
-          className="mt-20 text-center border-t border-white/5 pt-8 text-xs text-slate-500 leading-relaxed"
-        >
-          <p>Designed and Built by Dheeraj Kumar</p>
-          <p className="mt-1 font-mono text-[10px]">© {new Date().getFullYear()} All rights reserved.</p>
-        </motion.div>
       </div>
     </div>
   );

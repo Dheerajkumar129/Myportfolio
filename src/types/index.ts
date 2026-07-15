@@ -1,67 +1,115 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Type Definitions for Dheeraj Kumar Portfolio
-// ─────────────────────────────────────────────────────────────────────────────
+export type ProfileMode = 'general';
+
+export interface RoleDefinition {
+  id: ProfileMode;
+  label: string;
+  icon: string;
+}
 
 export interface HeroConfig {
-  name: string;
-  title: string;
-  subtitle: string;
-  tagline: string;
-  email: string;
-  phone: string;
-  linkedin: string;
-  github: string;
-  location: string;
-  availability: string;
-  englishLevel: string;
+  badge: string;
+  titleName: string;
+  headline: string;
+  subtext: string;
+  trustRow: string[];
+}
+
+export interface Metric {
+  label: string;
+  value: string;
 }
 
 export interface Project {
   id: string;
   title: string;
   description: string;
-  tech: string[];
-  date: string;
-  highlights: string[];
-  category: string;
+  technologies: string[];
+  metrics: Metric[];
+  githubUrl: string;
+  demoUrl?: string;
+  status: 'Deployed' | 'Beta' | 'In Progress';
+  featured: boolean;
+  priority: {
+    general: number;
+  };
+}
+
+export interface Skill {
+  name: string;
+  level: string; // 'Expert' | 'Advanced' | 'Intermediate'
 }
 
 export interface SkillCategory {
-  category: string;
-  icon: string;
-  skills: string[];
+  id?: string;
+  title: string;
+  skills: Skill[];
+  priority: {
+    general: number;
+  };
 }
 
 export interface Certification {
+  id: string;
   title: string;
   issuer: string;
+  code?: string;
   date: string;
-  badge?: string;
+  credentialUrl?: string;
+  badgeUrl?: string;
+  featured: boolean;
+  priority: {
+    general: number;
+  };
 }
 
-export interface TimelineItem {
+export interface JourneyMilestone {
   id: string;
-  type: 'education' | 'work' | 'achievement';
+  era: string; // e.g. "Foundation", "Transformation", etc.
   title: string;
-  organization: string;
-  location?: string;
-  period: string;
+  subtitle: string;
   description: string;
-  details?: string[];
-  grade?: string;
+  period: string;
+  emphasis: Record<string, boolean>;
 }
 
-export interface Strength {
-  label: string;
-  icon: string;
-  desc: string;
+export interface BlogNote {
+  id: string;
+  title: string;
+  excerpt: string;
+  readTime: string;
+  category: string;
+  date: string;
+  url: string;
+  content?: string; // Rich article markdown or text content
+  priority: {
+    general: number;
+  };
 }
 
 export interface HomeCard {
+  id: string;
   title: string;
-  icon: string;
+  subtitle: string;
+  description: string;
+  buttonText: string;
+  badge: string;
+  extra: string[];
+}
+
+export interface Coordinates {
+  email: string;
+  linkedin: string;
+  github: string;
+  location: string;
+  hours: string;
+}
+
+export interface PrestigeStrength {
+  id: string;
+  title: string;
   desc: string;
-  link: string;
+  signal: string;
+  icon: string;
 }
 
 export interface ProfileData {
@@ -69,7 +117,10 @@ export interface ProfileData {
   projects: Project[];
   skills: SkillCategory[];
   certifications: Certification[];
-  timeline: TimelineItem[];
-  strengths: Strength[];
+  journey: JourneyMilestone[];
+  blogs: BlogNote[];
   homeCards: HomeCard[];
+  coordinates: Coordinates;
+  strengths: PrestigeStrength[];
+  philosophy: string;
 }

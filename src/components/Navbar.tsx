@@ -1,145 +1,235 @@
-import { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Code2 } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Link, useLocation } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
+import { Menu, X, FileText, ChevronDown } from 'lucide-react';
 
-const navLinks = [
-  { path: '/', label: 'Home' },
-  { path: '/projects', label: 'Projects' },
-  { path: '/skills', label: 'Skills' },
-  { path: '/timeline', label: 'Timeline' },
-  { path: '/certifications', label: 'Certifications' },
-  { path: '/contact', label: 'Contact' },
-];
+interface NavbarProps {
+  isDark: boolean;
+  toggleTheme: () => void;
+}
 
-export default function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+export default function Navbar({ isDark, toggleTheme }: NavbarProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
+  
   const location = useLocation();
+  const menuContainerRef = useRef<HTMLDivElement>(null);
 
+  const navItems = [
+    { label: 'Home', path: '/' },
+    { label: 'Projects', path: '/projects' },
+    { label: 'Skills', path: '/skills' },
+    { label: 'Timeline', path: '/timeline' },
+    { label: 'Certifications', path: '/certifications' },
+    { label: 'Contact', path: '/contact' },
+  ];
+
+  // Close dropdown on click outside
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handler);
-    return () => window.removeEventListener('scroll', handler);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuContainerRef.current && !menuContainerRef.current.contains(event.target as Node)) {
+        setMenuDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [location]);
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 260, damping: 20 }}
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-          scrolled
-            ? 'py-3 bg-black/40 backdrop-blur-xl border-b border-white/5 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
-            : 'py-5 bg-transparent'
+      <nav
+        id="global-navbar"
+        className={`fixed left-1/2 -translate-x-1/2 w-[94%] md:w-[90%] max-w-7xl z-50 transition-all duration-500 ease-out rounded-full flex items-center justify-between px-6 md:px-10 top-4 py-3.5 ${
+          isDark
+            ? 'bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.6)] hover:border-white/20'
+            : 'bg-white/85 backdrop-blur-xl border border-black/5 shadow-[0_10px_35px_rgba(0,0,0,0.04)] hover:border-black/10'
         }`}
       >
-        <div className="max-w-6xl mx-auto px-6 sm:px-8">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <NavLink to="/" className="flex items-center gap-2.5 group">
-              <motion.div
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 via-purple-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/10"
-              >
-                <Code2 className="w-5.5 h-5.5 text-white" />
-              </motion.div>
-              <span className="font-extrabold text-xl tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
-                DK
-              </span>
-            </NavLink>
-
-            {/* Desktop Navigation Links */}
-            <div className="hidden md:flex items-center gap-2 p-1.5 rounded-2xl bg-white/[0.02] border border-white/5 backdrop-blur-md">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
-                return (
-                  <NavLink
-                    key={link.path}
-                    to={link.path}
-                    className="relative px-4 py-2 rounded-xl text-sm font-semibold tracking-wide transition-colors duration-300"
-                    style={{
-                      color: isActive ? '#ffffff' : 'rgba(255, 255, 255, 0.55)',
-                    }}
-                  >
-                    {isActive && (
-                      <motion.div
-                        layoutId="activeTabGlow"
-                        className="absolute inset-0 rounded-xl bg-white/[0.04] border border-white/10"
-                        transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                      />
-                    )}
-                    <span className="relative z-10">{link.label}</span>
-                  </NavLink>
-                );
-              })}
+        <div className="w-full flex items-center justify-between">
+          
+          {/* Brand/Logo */}
+          <Link
+            to="/"
+            id="navbar-logo"
+            className="group flex items-center gap-2.5 select-none focus:outline-none"
+          >
+            <div 
+              className={`w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-sm tracking-widest transition-all duration-300 overflow-hidden ${
+                isDark 
+                  ? 'bg-gradient-to-tr from-neutral-800 to-black border border-white/10 text-white group-hover:scale-105 group-hover:border-white/25 shadow-glow' 
+                  : 'bg-gradient-to-tr from-white to-slate-100 border border-black/10 text-neutral-900 group-hover:scale-105 group-hover:border-black/20 shadow-sm'
+              }`}
+            >
+              DK
             </div>
+            <div className="hidden sm:block text-left">
+              <span className={`text-xs block font-bold tracking-widest font-display uppercase leading-none ${isDark ? 'text-white' : 'text-neutral-900'}`}>
+                Dheeraj Kumar
+              </span>
+              <span className={`text-[9px] block font-mono tracking-wider transition-colors duration-500 ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                AI &amp; FRONTEND
+              </span>
+            </div>
+          </Link>
 
-            {/* Hire Me CTA button */}
-            <div className="flex items-center gap-4">
-              <motion.a
-                whileHover={{ scale: 1.03, y: -1 }}
-                whileTap={{ scale: 0.97 }}
-                href="mailto:dheerajkumar7135227@gmail.com"
-                className="hidden sm:inline-flex btn-apple-primary px-5 py-2"
-              >
-                Hire Me
-              </motion.a>
+          {/* Right Controls: Theme Switch + Resume Button + Menu Dropdown */}
+          <div className="hidden md:flex items-center gap-3">
+            
+            {/* custom theme manual toggle */}
+            <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
 
-              {/* Mobile Menu Button */}
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="md:hidden p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/5 border border-transparent hover:border-white/5 transition-all"
-                aria-label="Toggle menu"
+            {/* View Resume / Hire Me */}
+            <a
+              href="mailto:dheerajkumar7135227@gmail.com"
+              className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide flex items-center gap-1.5 focus:outline-none transition-all duration-300 cursor-pointer ${
+                isDark 
+                  ? 'bg-white text-black hover:bg-neutral-200 border border-transparent hover:shadow-[0_0_15px_rgba(255,255,255,0.25)]' 
+                  : 'bg-neutral-900 text-white hover:bg-neutral-800 border border-transparent hover:shadow-[0_5px_15px_rgba(0,0,0,0.1)]'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              <span>Hire Me</span>
+            </a>
+
+            {/* Desktop Navigation Links Dropdown */}
+            <div 
+              ref={menuContainerRef}
+              onMouseEnter={() => setMenuDropdownOpen(true)}
+              onMouseLeave={() => setMenuDropdownOpen(false)}
+              className="relative"
+              id="desktop-nav-menu"
+            >
+              <button
+                onClick={() => setMenuDropdownOpen(prev => !prev)}
+                className={`px-5 py-2 rounded-full flex items-center gap-2 text-xs font-semibold tracking-wider transition-all duration-300 focus:outline-none cursor-pointer border ${
+                  isDark 
+                    ? 'bg-black/60 border-white/10 hover:border-[#007AFF]/45 text-slate-300 hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
+                    : 'bg-white border-slate-200 hover:border-[#007AFF]/35 text-slate-700 hover:text-neutral-950 shadow-sm'
+                }`}
               >
-                {mobileOpen ? <X className="w-5.5 h-5.5" /> : <Menu className="w-5.5 h-5.5" />}
-              </motion.button>
+                <Menu className="w-3.5 h-3.5" />
+                <span className="font-display tracking-widest uppercase">Menu</span>
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${menuDropdownOpen ? 'rotate-180 text-[#007AFF]' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {menuDropdownOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className={`absolute right-0 mt-2 p-1.5 w-56 rounded-2xl border backdrop-blur-xl shadow-2xl overflow-hidden ${
+                      isDark 
+                        ? 'bg-neutral-950/95 border-white/10 text-white' 
+                        : 'bg-white/95 border-slate-200 text-neutral-800'
+                    }`}
+                  >
+                    <div className={`px-3 py-1.5 font-mono text-[8.5px] uppercase tracking-[0.2em] border-b mb-1.5 ${
+                      isDark ? 'border-white/5 text-slate-500' : 'border-slate-100 text-slate-400'
+                    }`}>
+                      Navigation
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      {navItems.map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                          <Link
+                            key={item.label}
+                            to={item.path}
+                            onClick={() => setMenuDropdownOpen(false)}
+                            className={`px-3 py-2 rounded-xl flex items-center justify-between text-xs font-semibold tracking-wider transition-colors duration-250 ${
+                              isActive 
+                                ? isDark 
+                                  ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20 shadow-[inset_0_1px_8px_rgba(0,122,255,0.05)]' 
+                                  : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
+                                : isDark
+                                  ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
+                                  : 'hover:bg-slate-50 text-slate-655 hover:text-neutral-900 border border-transparent'
+                            }`}
+                          >
+                            <span className="font-display tracking-widest uppercase">{item.label}</span>
+                            {isActive && <span className="w-1 h-1 rounded-full bg-[#007AFF] animate-pulse" />}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-        </div>
-      </motion.nav>
 
-      {/* Mobile Menu */}
+          {/* Mobile Buttons Layout */}
+          <div className="flex md:hidden items-center gap-2">
+            <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
+            
+            <button
+              id="mobile-menu-trigger"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`p-2.5 rounded-full border cursor-pointer focus:outline-none ${
+                isDark 
+                  ? 'bg-neutral-950 border-neutral-800 text-slate-300 hover:text-white' 
+                  : 'bg-slate-100 border-slate-200 text-slate-605'
+              }`}
+              aria-label="Open primary layout menu"
+            >
+              {mobileMenuOpen ? <X className="w-4.5 h-4.5" /> : <Menu className="w-4.5 h-4.5" />}
+            </button>
+          </div>
+
+        </div>
+      </nav>
+
+      {/* Mobile Menu Overlay */}
       <AnimatePresence>
-        {mobileOpen && (
+        {mobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-            className="fixed top-18 left-4 right-4 z-40 p-4 rounded-2xl apple-glass border border-white/10 md:hidden"
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className={`fixed inset-x-0 top-[76px] z-40 p-6 flex flex-col gap-6 md:hidden border-b ${
+              isDark 
+                ? 'bg-black/95 backdrop-blur-xl border-neutral-900 text-white shadow-2xl' 
+                : 'bg-white/95 backdrop-blur-xl border-slate-100 text-neutral-900 shadow-xl'
+            }`}
           >
-            <div className="flex flex-col gap-2">
-              {navLinks.map((link) => {
-                const isActive = location.pathname === link.path;
+            {/* Mobile Navigation List */}
+            <div className="flex flex-col gap-4">
+              {navItems.map((item) => {
+                const isActive = location.pathname === item.path;
                 return (
-                  <NavLink
-                    key={link.path}
-                    to={link.path}
-                    className={`px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
-                      isActive
-                        ? 'bg-white/5 text-white border border-white/10'
-                        : 'text-white/60 hover:text-white hover:bg-white/[0.02]'
+                  <Link
+                    key={item.label}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`text-sm font-medium uppercase tracking-wider py-1.5 px-3 rounded-xl transition-all duration-300 ${
+                      isActive 
+                        ? isDark ? 'bg-white/10 text-white' : 'bg-black/5 text-neutral-900 font-bold'
+                        : isDark ? 'text-slate-300 hover:bg-neutral-900 hover:text-white' : 'text-slate-600 hover:bg-slate-100 hover:text-neutral-950'
                     }`}
                   >
-                    {link.label}
-                  </NavLink>
+                    {item.label}
+                  </Link>
                 );
               })}
-              <a
-                href="mailto:dheerajkumar7135227@gmail.com"
-                className="btn-apple-primary text-center mt-3 py-3 w-full"
-              >
-                Hire Me
-              </a>
             </div>
+
+            {/* Mobile CTA */}
+            <a
+              href="mailto:dheerajkumar7135227@gmail.com"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`w-full py-3 rounded-xl text-xs font-semibold tracking-widest uppercase flex items-center justify-center gap-2 focus:outline-none transition-all duration-300 ${
+                isDark 
+                  ? 'bg-neutral-900 text-white border border-white/15' 
+                  : 'bg-slate-100 text-neutral-900 border border-slate-300'
+              }`}
+            >
+              <FileText className="w-4 h-4" />
+              <span>Hire Me</span>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,205 +1,324 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Tag, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import type { Project } from '../types';
+import { Github } from '../components/Icons';
+import SEO from '../components/SEO';
 
-interface Props {
+interface ProjectsPageProps {
   projects: Project[];
+  isDark: boolean;
 }
 
-const categoryColors: Record<string, string> = {
-  'AI / ML': 'text-purple-300 bg-purple-500/10 border-purple-500/20',
-  'Desktop App': 'text-cyan-300 bg-cyan-500/10 border-cyan-500/20',
-  'Systems': 'text-amber-300 bg-amber-500/10 border-amber-500/20',
-  'AI / NLP': 'text-pink-300 bg-pink-500/10 border-pink-500/20',
-  'Web App': 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20',
-};
+type ProjectCategory = 'All' | 'AI / ML' | 'Desktop App' | 'Systems' | 'Web App';
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08,
+export default function Projects({ projects, isDark }: ProjectsPageProps) {
+  const [activeCategory, setActiveCategory] = useState<ProjectCategory>('All');
+
+  // Categories list
+  const categories: ProjectCategory[] = ['All', 'AI / ML', 'Desktop App', 'Systems', 'Web App'];
+
+  // Filter projects based on active category
+  const filteredProjects = activeCategory === 'All' 
+    ? projects 
+    : projects.filter(p => p.priority && p.status && p.technologies && (p.id.includes(activeCategory.toLowerCase()) || p.technologies.some(t => t.includes(activeCategory)) || p.title.toLowerCase().includes(activeCategory.toLowerCase()) || (activeCategory === 'AI / ML' && p.technologies.some(t => ['CNN', 'LSTM', 'Mediapipe', 'ML'].includes(t)))));
+
+  // Identify featured project (Spotlight card)
+  const featuredProject = projects.find(p => p.featured) || projects[0];
+
+  // Container variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30, scale: 0.98 },
+    show: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        type: 'spring' as const,
+        stiffness: 100,
+        damping: 18,
+        duration: 0.8
+      }
     },
-  },
-} as const;
+    exit: { opacity: 0, y: -20, scale: 0.98, transition: { duration: 0.3 } }
+  };
 
-const cardVariants = {
-  hidden: { opacity: 0, y: 30, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { type: 'spring', stiffness: 100, damping: 15 },
-  },
-} as const;
-
-function ProjectCard({ project }: { project: Project }) {
-  const [expanded, setExpanded] = useState(false);
-  const catClass = categoryColors[project.category] || 'text-indigo-300 bg-indigo-500/10 border-indigo-500/20';
+  const projectsSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://Dheerajkumar129.github.io/Myportfolio/projects/#webpage",
+        "url": "https://Dheerajkumar129.github.io/Myportfolio/projects",
+        "name": "Projects Catalog | Dheeraj Kumar",
+        "description": "Browse projects catalog built by Dheeraj Kumar, showcasing machine learning gestures recognition, Tkinter CRUD desktop apps, and web portals."
+      }
+    ]
+  };
 
   return (
-    <motion.div
-      variants={cardVariants}
-      layout="position"
-      className="p-[1px] rounded-3xl bg-gradient-to-b from-white/10 via-white/5 to-transparent shadow-xl"
-    >
-      <div className="rounded-3xl bg-white/[0.01] backdrop-blur-2xl p-6 border border-white/5 flex flex-col h-full hover:bg-white/[0.03] transition-colors duration-300">
-        {/* Header */}
-        <div className="flex flex-col mb-4">
-          <div className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full border text-[10px] font-bold uppercase tracking-wider w-fit mb-3.5 ${catClass}`}>
-            <Tag className="w-3 h-3" /> {project.category}
-          </div>
-          <h3 className="text-xl font-extrabold text-white tracking-tight leading-snug">
-            {project.title}
-          </h3>
-        </div>
-
-        {/* Description */}
-        <p className="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6 flex-1">
-          {project.description}
-        </p>
-
-        {/* Tech Stack */}
-        <div className="flex flex-wrap gap-1.5 mb-6">
-          {project.tech.map((t) => (
-            <span key={t} className="px-2.5 py-1 rounded-lg bg-white/5 border border-white/5 text-slate-300 text-[10px] font-semibold">
-              {t}
+    <div className="min-h-screen py-28 px-6 md:px-12 max-w-7xl mx-auto w-full">
+      <SEO 
+        title="Projects & Works | Dheeraj Kumar"
+        description="Browse the collection of projects built by Dheeraj Kumar, showcasing hand gesture detection systems, inventory managers, and OOP pay applications."
+        keywords="Sign Language System, Inventory Tkinter, Payroll System, Python, C++, React"
+        canonicalUrl="https://Dheerajkumar129.github.io/Myportfolio/projects"
+        schema={projectsSchema}
+      />
+      
+      {/* Editorial Page Header */}
+      <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="text-left max-w-2xl">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-8 h-[1px] bg-[#007AFF]" />
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#007AFF]">
+              Bento Catalog v2.0
             </span>
-          ))}
+          </div>
+          <h1 className="text-4xl md:text-6xl font-sans font-semibold tracking-tight leading-none mb-6">
+            Architectural Works &amp;<br />
+            <span className={`text-transparent bg-clip-text bg-gradient-to-r ${
+              isDark 
+                ? 'from-white via-white/80 to-white/40' 
+                : 'from-neutral-950 via-neutral-900 to-neutral-500'
+            } italic font-serif font-medium`}>Intelligent Systems</span>
+          </h1>
+          <p className={`text-base md:text-lg font-light leading-relaxed ${
+            isDark ? 'text-slate-300' : 'text-slate-655'
+          }`}>
+            An asymmetrical curation of machine learning recognition systems, CRUD desktop software, and responsive web portals.
+          </p>
         </div>
-
-        {/* Footer info & Toggle */}
-        <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
-          <span className="flex items-center gap-1.5 text-slate-500 text-xs font-medium">
-            <Calendar className="w-3.5 h-3.5" /> {project.date}
-          </span>
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center gap-1.5 text-indigo-300 text-xs font-bold hover:text-indigo-200 transition-colors"
-          >
-            {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {expanded ? 'Hide Details' : 'Show Details'}
-          </button>
-        </div>
-
-        {/* Expanded Content */}
-        <AnimatePresence>
-          {expanded && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="overflow-hidden"
-            >
-              <div className="pt-4 mt-4 border-t border-white/5">
-                <h4 className="text-white text-xs font-bold uppercase tracking-wider mb-2.5">Key Highlights:</h4>
-                <ul className="space-y-2">
-                  {project.highlights.map((h, i) => (
-                    <li key={i} className="flex items-start gap-2 text-xs text-slate-400 leading-relaxed">
-                      <span className="text-indigo-400 font-bold select-none">•</span>
-                      <span>{h}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
-    </motion.div>
-  );
-}
 
-export default function Projects({ projects }: Props) {
-  const [filter, setFilter] = useState<string>('All');
-  const categories = ['All', ...Array.from(new Set(projects.map((p) => p.category)))];
-  const filtered = filter === 'All' ? projects : projects.filter((p) => p.category === filter);
+      {/* Luxury Filter Bar */}
+      <div className="mb-12 flex flex-wrap gap-2.5 items-center justify-start border-b border-white/5 pb-6">
+        {categories.map((cat) => {
+          const isActive = activeCategory === cat;
+          return (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`relative px-4 py-2.5 rounded-full text-xs font-semibold tracking-wider transition-all duration-300 focus:outline-none border-none bg-transparent cursor-pointer ${
+                isActive 
+                  ? isDark ? 'text-white' : 'text-neutral-900' 
+                  : isDark ? 'text-slate-400 hover:text-slate-200' : 'text-slate-500 hover:text-neutral-900'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="activeCategoryPill"
+                  className={`absolute inset-0 rounded-full z-0 ${
+                    isDark 
+                      ? 'bg-white/5 border border-white/10 shadow-[0_8px_16px_rgba(0,0,0,0.4)] backdrop-blur-md' 
+                      : 'bg-white border border-slate-200 shadow-[0_4px_12px_rgba(0,0,0,0.05)]'
+                  }`}
+                  transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+                />
+              )}
+              <span className="relative z-10">{cat}</span>
+            </button>
+          );
+        })}
+      </div>
 
-  return (
-    <div className="min-h-screen bg-[#03030c] pt-32 pb-24 relative overflow-hidden">
-      {/* Lighting Blur Blobs */}
-      <div className="blur-blob blob-indigo top-[-10%] left-[-10%]" />
-      <div className="blur-blob blob-cyan bottom-[-10%] right-[-10%]" />
-
-      <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8">
-        {/* Page Header */}
-        <div className="text-center mb-16">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="text-4xl sm:text-5xl font-black tracking-tight text-white mb-4"
-          >
-            Built Projects
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-slate-500 text-sm max-w-lg mx-auto"
-          >
-            A curated showcase of ML applications, automation systems, and web architectures.
-          </motion.p>
-
-          {/* Filters */}
+      {/* Bento Grid Content */}
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch"
+      >
+        {/* Spotlight Featured Project */}
+        {featuredProject && (activeCategory === 'All' || activeCategory === 'AI / ML') && (
           <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-wrap justify-center gap-2 mt-8 max-w-xl mx-auto p-1.5 rounded-2xl bg-white/[0.01] border border-white/5 backdrop-blur-md"
+            layout
+            variants={itemVariants}
+            className={`col-span-1 lg:col-span-12 p-8 md:p-10 rounded-[40px] relative overflow-hidden transition-all duration-500 hover:shadow-2xl border ${
+              isDark 
+                ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/25' 
+                : 'bg-white hover:bg-slate-50/80 border-neutral-200/60 hover:border-[#007AFF]/15'
+            } flex flex-col justify-between group`}
           >
-            {categories.map((cat) => {
-              const active = filter === cat;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => setFilter(cat)}
-                  className="relative px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors duration-300"
-                  style={{
-                    color: active ? '#ffffff' : 'rgba(255, 255, 255, 0.5)',
-                  }}
+            <div className="absolute -right-32 -bottom-32 w-96 h-96 rounded-full filter blur-[120px] opacity-15 pointer-events-none bg-[#007AFF]/30 transition-opacity group-hover:opacity-25" />
+            
+            <div className="relative z-10 w-full">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <span className={`px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase ${
+                  isDark ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20' : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
+                }`}>
+                  Spotlight System Spec
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className={`text-[10px] font-mono tracking-widest uppercase ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    Active Status: <span className="text-emerald-500 font-semibold">{featuredProject.status}</span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+                <div className="lg:col-span-6">
+                  <h2 className="text-3xl md:text-4xl font-sans font-semibold tracking-tight mb-4 group-hover:text-[#007AFF] transition-colors duration-300">
+                    {featuredProject.title}
+                  </h2>
+                  <p className={`text-sm md:text-base font-light leading-relaxed ${
+                    isDark ? 'text-slate-300' : 'text-slate-600'
+                  }`}>
+                    {featuredProject.description}
+                  </p>
+                </div>
+
+                <div className="lg:col-span-6 flex flex-col justify-end lg:items-end">
+                  <span className={`text-[9px] uppercase font-mono tracking-widest mb-3 block ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>
+                    System Stack Configuration
+                  </span>
+                  <div className="flex flex-wrap gap-2 lg:justify-end">
+                    {featuredProject.technologies.map((tech) => (
+                      <span
+                        key={tech}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-semibold tracking-wide border ${
+                          isDark 
+                            ? 'bg-white/5 border-white/5 text-slate-300' 
+                            : 'bg-slate-100 border-slate-200 text-slate-700'
+                        }`}
+                      >
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative z-10 border-t border-white/5 pt-8 mt-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+              <div className="col-span-1 md:col-span-2 grid grid-cols-3 gap-4">
+                {featuredProject.metrics && featuredProject.metrics.map((metric) => (
+                  <div key={metric.label}>
+                    <span className={`text-2xl md:text-3xl font-serif italic block font-medium text-[#007AFF] ${
+                      isDark ? 'text-white' : 'text-neutral-900'
+                    }`}>
+                      {metric.value}
+                    </span>
+                    <span className={`text-[9px] uppercase font-sans tracking-widest block mt-1 leading-none ${
+                      isDark ? 'text-slate-400' : 'text-slate-600'
+                    }`}>
+                      {metric.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="col-span-1 flex items-center justify-end gap-4">
+                <a
+                  href={featuredProject.githubUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={`p-3 rounded-2xl border flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                    isDark 
+                      ? 'bg-white/5 border-white/5 text-slate-300 hover:text-white hover:bg-[#007AFF]/10 hover:border-[#007AFF]/25' 
+                      : 'bg-slate-100 border-slate-200 text-slate-700 hover:text-neutral-950 hover:bg-[#007AFF]/5 hover:border-[#007AFF]/20'
+                  }`}
                 >
-                  {active && (
-                    <motion.div
-                      layoutId="activeFilterBg"
-                      className="absolute inset-0 rounded-xl bg-white/5 border border-white/10"
-                      transition={{ type: 'spring', stiffness: 350, damping: 25 }}
-                    />
-                  )}
-                  <span className="relative z-10">{cat}</span>
-                </button>
+                  <Github className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Other Projects */}
+        <AnimatePresence mode="popLayout">
+          {filteredProjects
+            .filter(p => !featuredProject || p.id !== featuredProject.id)
+            .filter(p => activeCategory === 'All' || 
+              (activeCategory === 'Desktop App' && p.id.includes('inventory')) ||
+              (activeCategory === 'Systems' && p.id.includes('payroll')) ||
+              (activeCategory === 'AI / ML' && p.id.includes('voice')) ||
+              (activeCategory === 'Web App' && p.id.includes('hospital'))
+            )
+            .map((proj, idx) => {
+              const isLarge = idx % 3 === 0;
+              return (
+                <motion.div
+                  key={proj.id}
+                  layout
+                  variants={itemVariants}
+                  exit="exit"
+                  className={`p-6 md:p-8 rounded-[32px] border transition-all duration-500 hover:shadow-xl ${
+                    isLarge ? 'col-span-1 lg:col-span-8' : 'col-span-1 lg:col-span-4'
+                  } ${
+                    isDark 
+                      ? 'bg-[#151515]/60 hover:bg-[#151515] border-white/5 hover:border-[#007AFF]/20' 
+                      : 'bg-white hover:bg-slate-50/80 border-neutral-200/60 hover:border-[#007AFF]/10'
+                  } flex flex-col justify-between group`}
+                >
+                  <div>
+                    <div className="flex items-center justify-between mb-5">
+                      <span className={`text-[9px] uppercase font-sans tracking-widest px-2.5 py-1 rounded-full font-bold border ${
+                        isDark
+                          ? proj.status === 'Deployed' 
+                            ? 'bg-[#007AFF]/15 text-[#007AFF] border-[#007AFF]/25' 
+                            : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                          : proj.status === 'Deployed'
+                            ? 'bg-[#007AFF]/5 text-[#007AFF] border-[#007AFF]/10'
+                            : 'bg-amber-500/5 text-amber-600 border-amber-500/10'
+                      }`}>
+                        {proj.status}
+                      </span>
+                    </div>
+
+                    <h3 className="text-xl font-sans font-semibold tracking-tight mb-2 group-hover:text-[#007AFF] transition-colors duration-300">
+                      {proj.title}
+                    </h3>
+                    <p className={`text-xs font-light leading-relaxed mb-6 ${
+                      isDark ? 'text-slate-300' : 'text-slate-600'
+                    }`}>
+                      {proj.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+                    <div className="flex flex-wrap gap-1.5">
+                      {proj.technologies.slice(0, 3).map((tech) => (
+                        <span 
+                          key={tech} 
+                          className={`px-2 py-1 rounded-lg text-[9px] font-mono border ${
+                            isDark ? 'bg-white/5 border-white/5 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'
+                          }`}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <a
+                        href={proj.githubUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className={`p-2.5 rounded-xl border flex items-center justify-center transition-all cursor-pointer ${
+                          isDark ? 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300' : 'bg-slate-100 border-slate-200 hover:bg-slate-200 text-slate-700'
+                        }`}
+                      >
+                        <Github className="w-3.5 h-3.5" />
+                      </a>
+                    </div>
+                  </div>
+                </motion.div>
               );
             })}
-          </motion.div>
-        </div>
-
-        {/* Gallery Grid */}
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          layout
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          <AnimatePresence mode="popLayout">
-            {filtered.map((project) => (
-              <motion.div
-                key={project.id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ProjectCard project={project} />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-      </div>
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

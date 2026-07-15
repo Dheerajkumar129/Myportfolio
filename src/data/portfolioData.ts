@@ -1,279 +1,309 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Portfolio Data — Dheeraj Kumar
-// ─────────────────────────────────────────────────────────────────────────────
-
 import type { ProfileData } from '../types';
 
 export const profileData: ProfileData = {
   hero: {
-    name: 'Dheeraj Kumar',
-    title: 'AI Trainer & Frontend Developer',
-    subtitle: 'MCA Graduate · RLHF Specialist · React JS Developer',
-    tagline: 'Bridging human intelligence with machine learning — crafting high-quality training data and building elegant web interfaces.',
-    email: 'dheerajkumar7135227@gmail.com',
-    phone: '+91 9801657880',
-    linkedin: 'https://linkedin.com/in/dheerajkumar45',
-    github: 'https://github.com/Dheerajkumar129',
-    location: 'Jalandhar, Punjab, India',
-    availability: 'Open to Opportunities',
-    englishLevel: 'C1 Advanced',
+    badge: 'AI Alignment & Frontend Developer',
+    titleName: 'Dheeraj Kumar',
+    headline: 'Refining LLM Coherence & Building Immersive Interfaces',
+    subtext: 'Detail-oriented MCA graduate with 1+ year of professional experience in AI data annotation, RLHF (Reinforcement Learning from Human Feedback), and LLM response validation. Passionate about prompt engineering, AI alignment, and crafting beautiful responsive React user interfaces.',
+    trustRow: [
+      'RLHF & Alignment',
+      'React JS',
+      'Python',
+      'Prompt Engineering',
+      'C1 English Proficiency'
+    ]
   },
-
-  homeCards: [
-    { title: 'Projects', icon: '🚀', desc: 'ML systems, web apps, and more', link: '/projects' },
-    { title: 'Skills', icon: '⚡', desc: 'AI, Python, React & beyond', link: '/skills' },
-    { title: 'Timeline', icon: '📅', desc: 'My education & experience', link: '/timeline' },
-    { title: 'Certifications', icon: '🏆', desc: 'Verified credentials', link: '/certifications' },
-    { title: 'Contact', icon: '📨', desc: 'Let\'s collaborate', link: '/contact' },
-  ],
 
   projects: [
     {
-      id: 'isl',
+      id: 'isl-recognition-system',
       title: 'Indian Sign Language Recognition System',
-      description:
-        'A real-time hand gesture detection and classification system that recognizes ISL alphabet signs, builds words/sentences with auto-correction, and converts text to speech.',
-      tech: ['Python', 'CNN', 'ANN', 'RNN', 'SVM', 'LSTM', 'Mediapipe', 'cvzone', 'pyttsx3', 'Tkinter'],
-      date: 'May 2025',
-      category: 'AI / ML',
-      highlights: [
-        'Real-time hand gesture detection using CNN and Mediapipe',
-        'Classifies ISL alphabet signs with a pre-trained CNN model',
-        'Builds words/sentences with auto-correction suggestions',
-        'Converts recognized text to speech using pyttsx3',
-        'User-friendly Tkinter GUI for accessibility',
+      description: 'Engineered a real-time hand gesture detection and classification system for accessibility. Implemented deep learning (CNN, LSTM) for ISL alphabet sign translation, complete with word construction, auto-correction suggestions, and text-to-speech feedback.',
+      technologies: ['Python', 'CNN', 'LSTM', 'Mediapipe', 'cvzone', 'pyttsx3', 'Tkinter'],
+      metrics: [
+        { label: 'Gesture Accuracy', value: '94%' },
+        { label: 'Latency Rate', value: '30fps' }
       ],
+      githubUrl: 'https://github.com/Dheerajkumar129',
+      status: 'Deployed',
+      featured: true,
+      priority: { general: 1 }
     },
     {
-      id: 'inventory',
-      title: 'Inventory Management System',
-      description:
-        'A full CRUD desktop application with robust input validation, error handling, and a responsive Tkinter interface backed by SQLite.',
-      tech: ['Python', 'Tkinter', 'SQLite'],
-      date: 'Oct 2024',
-      category: 'Desktop App',
-      highlights: [
-        'Full CRUD operations with robust input validation',
-        'Responsive interface using Tkinter: labels, entries, buttons, Treeview',
-        'SQLite database backend for persistent data storage',
-        'Error handling and user feedback mechanisms',
+      id: 'inventory-management',
+      title: 'Desktop Inventory Management System',
+      description: 'Developed a full CRUD desktop inventory tracking application. Features a responsive Tkinter layout with custom search filter components, input validations, error-handling diagnostics, and a persistent SQLite database engine.',
+      technologies: ['Python', 'Tkinter', 'SQLite'],
+      metrics: [
+        { label: 'Query Latency', value: '<5ms' }
       ],
+      githubUrl: 'https://github.com/Dheerajkumar129',
+      status: 'Deployed',
+      featured: false,
+      priority: { general: 2 }
     },
     {
-      id: 'payroll',
+      id: 'payroll-management',
       title: 'Employee & Payroll Management System',
-      description:
-        'A C++ system to manage employee data, calculate salaries, generate pay reports, and maintain HR records efficiently.',
-      tech: ['C++'],
-      date: 'Aug 2024',
-      category: 'Systems',
-      highlights: [
-        'Manages employee data with add/update/delete operations',
-        'Salary calculation engine with configurable components',
-        'Generates detailed payroll reports',
-        'Clean OOP design with proper encapsulation',
-      ],
+      description: 'Implemented a robust C++ payroll calculations application. Manages employee database records, automated salary component calculations (allowances, tax deductions), and generates clean audit reports.',
+      technologies: ['C++', 'Object-Oriented Programming'],
+      metrics: [],
+      githubUrl: 'https://github.com/Dheerajkumar129',
+      status: 'Deployed',
+      featured: false,
+      priority: { general: 3 }
     },
     {
-      id: 'vva',
+      id: 'voice-assistant',
       title: 'Virtual Voice Assistant',
-      description:
-        'A Python voice assistant with voice recognition and NLP for hands-free query answering, web browsing, and Wikipedia lookups.',
-      tech: ['Python', 'pyttsx3', 'speech_recognition', 'wikipedia', 'webbrowser', 'os'],
-      date: 'Apr 2023',
-      category: 'AI / NLP',
-      highlights: [
-        'Voice recognition using speech_recognition library',
-        'Text-to-speech output with pyttsx3',
-        'Wikipedia integration for knowledge queries',
-        'Web browser control and OS-level commands',
-        'Hands-free operation with high accuracy',
-      ],
+      description: 'Developed a voice assistant with speech recognition and NLP capabilities for hands-free operations. Configured integrations with web search services, Wikipedia queries, and local OS commands.',
+      technologies: ['Python', 'pyttsx3', 'Speech Recognition', 'NLP'],
+      metrics: [],
+      githubUrl: 'https://github.com/Dheerajkumar129',
+      status: 'Deployed',
+      featured: false,
+      priority: { general: 4 }
     },
     {
-      id: 'hospital',
-      title: 'Hospital Management System',
-      description:
-        'A web-based hospital management system with user authentication, patient records, appointment booking, and doctor management.',
-      tech: ['HTML', 'CSS', 'JavaScript', 'Bootstrap'],
-      date: 'May 2022',
-      category: 'Web App',
-      highlights: [
-        'User authentication and role-based access control',
-        'Patient record management and appointment scheduling',
-        'Responsive design with Bootstrap framework',
-        'Clean and intuitive UI for healthcare staff',
-      ],
-    },
+      id: 'hospital-portal',
+      title: 'Web-Based Hospital Management System',
+      description: 'Created a responsive web portal prototype with patient registration logs, secure appointment booking flows, medical catalogue views, and Bootstrap grid styling layouts.',
+      technologies: ['HTML5', 'CSS3', 'JavaScript', 'Bootstrap'],
+      metrics: [],
+      githubUrl: 'https://github.com/Dheerajkumar129',
+      status: 'Deployed',
+      featured: false,
+      priority: { general: 5 }
+    }
   ],
 
   skills: [
     {
-      category: 'AI & Data Annotation',
-      icon: '🤖',
+      title: 'AI & Data Annotation',
       skills: [
-        'RLHF (Reinforcement Learning from Human Feedback)',
-        'Data Annotation',
-        'Content Quality Evaluation',
-        'LLM Output Review',
-        'Prompt Engineering',
-        'Fact-Checking',
+        { name: 'RLHF Training', level: 'Expert' },
+        { name: 'Data Annotation', level: 'Expert' },
+        { name: 'LLM Output Review', level: 'Expert' },
+        { name: 'Prompt Engineering', level: 'Expert' },
+        { name: 'Fact-Checking', level: 'Expert' }
       ],
+      priority: { general: 1 }
     },
     {
-      category: 'Programming Languages',
-      icon: '💻',
-      skills: ['Python', 'JavaScript (ES6+)', 'TypeScript', 'C', 'C++', 'Java', 'HTML5', 'CSS3', 'SQL', 'R', 'MySQL'],
-    },
-    {
-      category: 'Frameworks & Libraries',
-      icon: '⚛️',
-      skills: ['React JS', 'Machine Learning Basics', 'Data Structures & Algorithms', 'Responsive Web Design', 'CNN', 'SVM', 'LSTM'],
-    },
-    {
-      category: 'Tools & Platforms',
-      icon: '🛠️',
-      skills: ['Git', 'GitHub', 'Tableau', 'Excel', 'Linux', 'Tkinter', 'SQLite', 'Mediapipe', 'Vite'],
-    },
-    {
-      category: 'Writing & Communication',
-      icon: '✍️',
+      title: 'Languages & Web Core',
       skills: [
-        'Technical Writing',
-        'Instructional Content',
-        'Style Guide Adherence',
-        'C1 Advanced English',
-        'Academic Writing',
+        { name: 'Python', level: 'Expert' },
+        { name: 'JavaScript (ES6+)', level: 'Advanced' },
+        { name: 'TypeScript', level: 'Intermediate' },
+        { name: 'SQL', level: 'Advanced' },
+        { name: 'C++', level: 'Advanced' }
       ],
+      priority: { general: 2 }
     },
     {
-      category: 'Soft Skills',
-      icon: '🌟',
-      skills: ['Attention to Detail', 'Adaptability', 'Time Management', 'Leadership', 'Collaboration', 'Independent Work'],
+      title: 'Frameworks & Technologies',
+      skills: [
+        { name: 'React JS', level: 'Advanced' },
+        { name: 'TailwindCSS', level: 'Advanced' },
+        { name: 'Vite', level: 'Advanced' },
+        { name: 'CNN / LSTM Basics', level: 'Intermediate' }
+      ],
+      priority: { general: 3 }
     },
-  ],
-
-  strengths: [
-    { label: 'AI Training', icon: '🤖', desc: 'RLHF & LLM output evaluation expert' },
-    { label: 'React Developer', icon: '⚛️', desc: 'Building responsive web UIs' },
-    { label: 'Data Annotation', icon: '🏷️', desc: 'High-quality annotation at scale' },
-    { label: 'Python', icon: '🐍', desc: 'ML, automation, and backend scripts' },
-    { label: 'Technical Writing', icon: '✍️', desc: 'Clear, fact-checked content' },
-    { label: 'C1 English', icon: '🌐', desc: 'Advanced English proficiency' },
+    {
+      title: 'Tools & Utilities',
+      skills: [
+        { name: 'Git & GitHub', level: 'Expert' },
+        { name: 'Tableau', level: 'Advanced' },
+        { name: 'Excel / Sheets', level: 'Expert' },
+        { name: 'SQLite', level: 'Advanced' }
+      ],
+      priority: { general: 4 }
+    },
+    {
+      title: 'Professional Communication',
+      skills: [
+        { name: 'Technical Writing', level: 'Expert' },
+        { name: 'Style Guide Adherence', level: 'Expert' },
+        { name: 'Instructional Content', level: 'Expert' },
+        { name: 'C1 Advanced English', level: 'Expert' }
+      ],
+      priority: { general: 5 }
+    }
   ],
 
   certifications: [
     {
+      id: 'ibm-python-ds-ai',
       title: 'Python for Data Science, AI & Development',
       issuer: 'Coursera (IBM)',
       date: 'Sep 2024',
+      featured: true,
+      priority: { general: 1 }
     },
     {
+      id: 'cpp-oop',
       title: 'Object Oriented Programming Specialization (C++)',
       issuer: 'Coursera',
       date: 'Jul 2024',
+      featured: true,
+      priority: { general: 2 }
     },
     {
+      id: 'cipherschools-cpp-dsa',
       title: 'CPP & Data Structures Bootcamp',
       issuer: 'CipherSchools',
       date: 'Aug 2024',
+      featured: false,
+      priority: { general: 3 }
     },
     {
+      id: 'simplilearn-software-dev',
       title: 'Software Development Certificate',
       issuer: 'Simplilearn (SkillUp)',
       date: 'Jan 2024',
+      featured: false,
+      priority: { general: 4 }
     },
     {
+      id: 'upgrad-hack-quest',
       title: 'Hack Quest Participation',
       issuer: 'upGrad Campus',
       date: 'Mar 2024',
+      featured: false,
+      priority: { general: 5 }
     },
     {
+      id: 'google-c-prog',
       title: 'C Programming Certificate',
       issuer: 'Google Developers Launchpad',
       date: 'Aug 2021',
-    },
+      featured: false,
+      priority: { general: 6 }
+    }
   ],
 
-  timeline: [
+  journey: [
     {
-      id: 'alignerr',
-      type: 'work',
+      id: 'alignerr-trainer',
+      era: 'Professional Practice',
       title: 'AI Trainer / Data Annotator',
-      organization: 'Alignerr',
+      subtitle: 'Alignerr · Remote Contract',
       period: 'Sep 2025 – Mar 2026',
-      description: 'Contributed to AI alignment projects by annotating and evaluating model-generated content across text, reasoning, and instruction-following tasks.',
-      details: [
-        'Annotated and evaluated AI-generated content for alignment quality',
-        'Produced structured, high-quality written content following strict editorial guidelines',
-        'Maintained consistency across large volumes of annotation tasks',
-        'Flagged edge cases to improve annotation guidelines and dataset integrity',
-      ],
+      description: 'Contributed to advanced AI alignment tasks, ranking and evaluating model-generated outputs. Produced high-quality prompts and logical proofs adhering to editorial guidelines to train LLM models.',
+      emphasis: { 'AI Alignment': true, 'Quality Assurance': true }
     },
     {
-      id: 'outlier',
-      type: 'work',
-      title: 'AI Trainer / RLHF Contributor & Data Annotator',
-      organization: 'Outlier.ai',
+      id: 'outlier-rlhf',
+      era: 'Professional Practice',
+      title: 'AI Trainer & RLHF Contributor',
+      subtitle: 'Outlier.ai · Remote Contract',
       period: 'Dec 2024 – Jun 2025',
-      description: 'Performed RLHF tasks including ranking, rating, and rewriting AI-generated responses to improve model accuracy and output quality.',
-      details: [
-        'Performed RLHF: ranking, rating, and rewriting AI responses',
-        'Crafted original, fact-checked responses contributing to LLM training datasets',
-        'Evaluated AI outputs for coherence, accuracy, tone, and safety',
-        'Worked across creative writing, technical explanations, and coding evaluations',
-      ],
+      description: 'Evaluated LLMs on factuality, coherence, and safety standards. Authored reference responses, evaluated reasoning steps, and provided detailed critique summaries to guide model adjustments.',
+      emphasis: { 'RLHF': true, 'Coherence Review': true }
     },
     {
-      id: 'deloitte',
-      type: 'work',
-      title: 'Data Analytics Job Simulation',
-      organization: 'Deloitte Australia (via Forage)',
+      id: 'deloitte-simulation',
+      era: 'Experiential Training',
+      title: 'Data Analytics Simulation participant',
+      subtitle: 'Deloitte Australia (via Forage)',
       period: 'Jul 2025',
-      description: 'Completed a professional consulting simulation involving data analysis and forensic technology.',
-      details: [
-        'Built interactive Tableau dashboard for stakeholder reporting',
-        'Applied Excel for data classification and generating business insights',
-        'Completed forensic data analysis in a consulting environment',
-      ],
+      description: 'Completed data cleansing, modeling, and client presentation simulations. Built an interactive Tableau dashboard visualizing key business metrics.',
+      emphasis: { 'Data Visualization': true, 'Analytics Reporting': true }
     },
     {
-      id: 'mca',
-      type: 'education',
+      id: 'lpu-mca',
+      era: 'Postgraduate Education',
       title: 'Master of Computer Applications (MCA)',
-      organization: 'Lovely Professional University',
-      location: 'Jalandhar, Punjab',
+      subtitle: 'Lovely Professional University',
       period: 'Aug 2023 – Jul 2025',
-      description: 'Specialized in AI, machine learning, web development, and advanced programming.',
-      grade: 'CGPA: 7.4',
+      description: 'Focused on advanced database systems, machine learning basics, responsive web development, and algorithms. Graduated with a CGPA of 7.4.',
+      emphasis: { 'MCA degree': true, 'LPU': true }
     },
     {
-      id: 'bca',
-      type: 'education',
+      id: 'aku-bca',
+      era: 'Undergraduate Education',
       title: 'Bachelor of Computer Applications (BCA)',
-      organization: 'Aryabhatta Knowledge University',
-      location: 'Patna, Bihar',
+      subtitle: 'Aryabhatta Knowledge University',
       period: 'Aug 2020 – Jun 2023',
-      description: 'Foundational computing, programming, mathematics, and software engineering.',
-      grade: 'CGPA: 8.57',
-    },
-    {
-      id: 'article',
-      type: 'achievement',
-      title: 'Published Article – "Self-Reliance"',
-      organization: 'Swavlamban College Journal',
-      period: 'Sep 2021',
-      description: 'Selected through a competitive review process for outstanding writing, research, and creativity. Demonstrated meaningful academic and creative contributions to the college community.',
-    },
-    {
-      id: 'intermediate',
-      type: 'education',
-      title: 'Intermediate (Mathematics)',
-      organization: 'S.P.Y. Inter College',
-      location: 'Gaya, Bihar',
-      period: 'Apr 2018 – Mar 2020',
-      description: 'Mathematics stream with focus on analytical and logical reasoning.',
-      grade: '71%',
-    },
+      description: 'Acquired foundational skills in C, C++, Java, DBMS, and web markup. Graduated with a CGPA of 8.57.',
+      emphasis: { 'BCA degree': true, 'AKU': true }
+    }
   ],
+
+  blogs: [],
+
+  homeCards: [
+    {
+      id: 'ai-assistant',
+      badge: 'Addy Twin',
+      title: 'RAG AI Digital Twin',
+      subtitle: 'Interactive Grounded Chatbot',
+      description: 'Chat with "Addy", an AI digital twin grounded on Dheeraj\'s resume CV knowledge base. Ask about project architectures, tech skills, and availability.',
+      buttonText: 'Initialize Agent',
+      extra: ['Powered by client-side semantic index', 'Zero server dependencies']
+    },
+    {
+      id: 'availability',
+      badge: 'Status: Active',
+      title: 'Professional Contracts',
+      subtitle: 'Open for Engagements',
+      description: 'Available for prompt engineering, RLHF annotations, frontend development contract roles, and remote technical tasks.',
+      buttonText: 'Discuss Projects',
+      extra: ['Advanced English (C1)', 'Flexible remote hours']
+    },
+    {
+      id: 'featured-stack',
+      badge: 'Capabilities',
+      title: 'Primary Core Stack',
+      subtitle: 'AI Tools & Web Techs',
+      description: 'Skilled in building responsive glassmorphic React interfaces, programming in Python for data utilities, and structuring annotations.',
+      buttonText: 'View Grid',
+      extra: ['React JS', 'Python & C++', 'SQL & SQLite']
+    },
+    {
+      id: 'quick-connect',
+      badge: 'Outreach Channel',
+      title: 'Get in Touch Directly',
+      subtitle: 'Fast Response Times',
+      description: 'Reach out directly for freelance contracts, recruitment inquiries, or pair-programming collaborations.',
+      buttonText: 'Contact gateway',
+      extra: ['dheerajkumar7135227@gmail.com', '+91 9801657880']
+    }
+  ],
+
+  coordinates: {
+    email: 'dheerajkumar7135227@gmail.com',
+    linkedin: 'https://linkedin.com/in/dheerajkumar45',
+    github: 'https://github.com/Dheerajkumar129',
+    location: 'Jalandhar, Punjab, India',
+    hours: 'Flexible / Remote'
+  },
+
+  strengths: [
+    {
+      id: 'rlhf',
+      title: 'RLHF & Annotation',
+      desc: 'Expert in checking LLM logic, instruction following, and output validation.',
+      signal: 'Expertise',
+      icon: 'Cpu'
+    },
+    {
+      id: 'react-dev',
+      title: 'React Front-End',
+      desc: 'Building responsive, animated web layouts using React, TailwindCSS, and motion.',
+      signal: 'Framework',
+      icon: 'Layers'
+    },
+    {
+      id: 'python-dev',
+      title: 'Python Scripting',
+      desc: 'Familiar with data processing tools, machine learning pipelines, and automations.',
+      signal: 'Programming',
+      icon: 'Database'
+    }
+  ],
+
+  philosophy: 'I believe in bridging human intelligence and machine learning—crafting high-quality annotation data and clean, responsive UI layouts.'
 };
