@@ -1,8 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation } from 'react-router-dom';
 import ThemeToggle from './ThemeToggle';
-import { Menu, X, FileText, ChevronDown } from 'lucide-react';
+import { Menu, X, FileText } from 'lucide-react';
 
 interface NavbarProps {
   isDark: boolean;
@@ -11,10 +11,7 @@ interface NavbarProps {
 
 export default function Navbar({ isDark, toggleTheme }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [menuDropdownOpen, setMenuDropdownOpen] = useState(false);
-  
   const location = useLocation();
-  const menuContainerRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { label: 'Home', path: '/' },
@@ -25,34 +22,23 @@ export default function Navbar({ isDark, toggleTheme }: NavbarProps) {
     { label: 'Contact', path: '/contact' },
   ];
 
-  // Close dropdown on click outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (menuContainerRef.current && !menuContainerRef.current.contains(event.target as Node)) {
-        setMenuDropdownOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
     <>
       <nav
         id="global-navbar"
-        className={`fixed left-1/2 -translate-x-1/2 w-[94%] md:w-[90%] max-w-7xl z-50 transition-all duration-500 ease-out rounded-full flex items-center justify-between px-6 md:px-10 top-4 py-3.5 ${
+        className={`fixed left-1/2 -translate-x-1/2 w-[94%] md:w-[90%] max-w-7xl z-50 transition-all duration-500 ease-out rounded-full flex items-center justify-between px-6 md:px-8 top-4 py-3 ${
           isDark
-            ? 'bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.6)] hover:border-white/20'
-            : 'bg-white/85 backdrop-blur-xl border border-black/5 shadow-[0_10px_35px_rgba(0,0,0,0.04)] hover:border-black/10'
+            ? 'bg-black/60 backdrop-blur-xl border border-white/10 shadow-[0_20px_40px_rgba(0,0,0,0.6)]'
+            : 'bg-white/85 backdrop-blur-xl border border-black/5 shadow-[0_10px_35px_rgba(0,0,0,0.04)]'
         }`}
       >
-        <div className="w-full flex items-center justify-between">
+        <div className="w-full flex items-center justify-between gap-4">
           
           {/* Brand/Logo */}
           <Link
             to="/"
             id="navbar-logo"
-            className="group flex items-center gap-2.5 select-none focus:outline-none"
+            className="group flex items-center gap-2.5 select-none focus:outline-none shrink-0"
           >
             <div 
               className={`w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-sm tracking-widest transition-all duration-300 overflow-hidden ${
@@ -73,13 +59,41 @@ export default function Navbar({ isDark, toggleTheme }: NavbarProps) {
             </div>
           </Link>
 
-          {/* Right Controls: Theme Switch + Resume Button + Menu Dropdown */}
-          <div className="hidden md:flex items-center gap-3">
-            
-            {/* custom theme manual toggle */}
-            <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
+          {/* Center Navigation Links for Desktop (Directly Visible Pages) */}
+          <div className={`hidden md:flex items-center gap-1.5 border rounded-full p-1.5 ${
+            isDark ? 'bg-white/5 border-white/5' : 'bg-slate-100 border-slate-200'
+          }`}>
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.path;
+              return (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  className={`px-4 py-2 rounded-full text-[10px] font-bold tracking-widest relative transition-colors duration-300 focus:outline-none ${
+                    isActive 
+                      ? 'text-[#a855f7]' 
+                      : isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-neutral-950'
+                  }`}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="navPill"
+                      className={`absolute inset-0 rounded-full z-0 border ${
+                        isDark ? 'bg-white/5 border-white/10' : 'bg-white border-slate-200 shadow-sm'
+                      }`}
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                  <span className="relative z-10 font-display uppercase tracking-widest">{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
 
-            {/* View Resume / Hire Me */}
+          {/* Right Controls: Theme Switch + Resume Button */}
+          <div className="hidden md:flex items-center gap-3 shrink-0">
+            <ThemeToggle isDark={isDark} toggleTheme={toggleTheme} />
+            
             <a
               href="mailto:dheerajkumar7135227@gmail.com"
               className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide flex items-center gap-1.5 focus:outline-none transition-all duration-300 cursor-pointer ${
@@ -91,74 +105,6 @@ export default function Navbar({ isDark, toggleTheme }: NavbarProps) {
               <FileText className="w-3.5 h-3.5" />
               <span>Hire Me</span>
             </a>
-
-            {/* Desktop Navigation Links Dropdown */}
-            <div 
-              ref={menuContainerRef}
-              onMouseEnter={() => setMenuDropdownOpen(true)}
-              onMouseLeave={() => setMenuDropdownOpen(false)}
-              className="relative"
-              id="desktop-nav-menu"
-            >
-              <button
-                onClick={() => setMenuDropdownOpen(prev => !prev)}
-                className={`px-5 py-2 rounded-full flex items-center gap-2 text-xs font-semibold tracking-wider transition-all duration-300 focus:outline-none cursor-pointer border ${
-                  isDark 
-                    ? 'bg-black/60 border-white/10 hover:border-[#007AFF]/45 text-slate-300 hover:text-white shadow-[0_4px_12px_rgba(0,0,0,0.5)]' 
-                    : 'bg-white border-slate-200 hover:border-[#007AFF]/35 text-slate-700 hover:text-neutral-950 shadow-sm'
-                }`}
-              >
-                <Menu className="w-3.5 h-3.5" />
-                <span className="font-display tracking-widest uppercase">Menu</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${menuDropdownOpen ? 'rotate-180 text-[#007AFF]' : ''}`} />
-              </button>
-
-              <AnimatePresence>
-                {menuDropdownOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    transition={{ duration: 0.2, ease: "easeOut" }}
-                    className={`absolute right-0 mt-2 p-1.5 w-56 rounded-2xl border backdrop-blur-xl shadow-2xl overflow-hidden ${
-                      isDark 
-                        ? 'bg-neutral-950/95 border-white/10 text-white' 
-                        : 'bg-white/95 border-slate-200 text-neutral-800'
-                    }`}
-                  >
-                    <div className={`px-3 py-1.5 font-mono text-[8.5px] uppercase tracking-[0.2em] border-b mb-1.5 ${
-                      isDark ? 'border-white/5 text-slate-500' : 'border-slate-100 text-slate-400'
-                    }`}>
-                      Navigation
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      {navItems.map((item) => {
-                        const isActive = location.pathname === item.path;
-                        return (
-                          <Link
-                            key={item.label}
-                            to={item.path}
-                            onClick={() => setMenuDropdownOpen(false)}
-                            className={`px-3 py-2 rounded-xl flex items-center justify-between text-xs font-semibold tracking-wider transition-colors duration-250 ${
-                              isActive 
-                                ? isDark 
-                                  ? 'bg-[#007AFF]/10 text-[#007AFF] border border-[#007AFF]/20 shadow-[inset_0_1px_8px_rgba(0,122,255,0.05)]' 
-                                  : 'bg-[#007AFF]/5 text-[#007AFF] border border-[#007AFF]/10'
-                                : isDark
-                                  ? 'hover:bg-white/5 text-slate-400 hover:text-white border border-transparent'
-                                  : 'hover:bg-slate-50 text-slate-655 hover:text-neutral-900 border border-transparent'
-                            }`}
-                          >
-                            <span className="font-display tracking-widest uppercase">{item.label}</span>
-                            {isActive && <span className="w-1 h-1 rounded-full bg-[#007AFF] animate-pulse" />}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
           </div>
 
           {/* Mobile Buttons Layout */}

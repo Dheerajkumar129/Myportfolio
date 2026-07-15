@@ -83,7 +83,7 @@ export default function App() {
   return (
     <HashRouter>
       <div className={`min-h-screen flex flex-col relative font-sans transition-colors duration-1000 overflow-x-hidden ${
-        isDark ? 'bg-[#050505] text-slate-100' : 'bg-slate-50 text-neutral-900'
+        isDark ? 'bg-[#030014] text-slate-100' : 'bg-slate-50 text-neutral-900'
       }`}>
         
         {/* Persistent glass Navbar */}
