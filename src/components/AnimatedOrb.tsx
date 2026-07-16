@@ -1,288 +1,264 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import React, { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion } from 'motion/react';
 
-interface AnimatedOrbProps {
+interface NeuralBrainProps {
   isDark: boolean;
 }
 
-export default function AnimatedOrb({ isDark }: AnimatedOrbProps) {
+// A neural network "brain" visualization — interconnected nodes that
+// react to the cursor, pulse organically, and reorganize on hover.
+export default function NeuralBrain({ isDark }: NeuralBrainProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const animFrameRef = useRef<number>(0);
+  const mouseRef = useRef({ x: 0, y: 0, active: false });
   const [isHovered, setIsHovered] = useState(false);
-  const [pulseTrigger, setPulseTrigger] = useState(0);
-  const [coords, setCoords] = useState({ x: 0, y: 0 });
-  const [activeSector, setActiveSector] = useState('SYS_LOCK: ACTIVE');
-  const [hudColorClass, setHudColorClass] = useState('text-cyan-400 border-cyan-400');
 
-  const dimensionsRef = useRef({ width: 450, height: 450 });
+  // Fixed node positions in a brain-like cluster shape
+  const nodesRef = useRef<Array<{
+    x: number; y: number; baseX: number; baseY: number;
+    radius: number; phase: number; speed: number;
+    layer: number; // 0=core, 1=mid, 2=outer
+  }>>([]);
 
-  const handleMouseEnter = () => {
-    setIsHovered(true);
-    setPulseTrigger(prev => prev + 1);
+  const SIZE = 400;
+  const CENTER = SIZE / 2;
+
+  const initNodes = useCallback(() => {
+    const nodes: typeof nodesRef.current = [];
+
+    // Core cluster (dense center — "deep layers")
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2 + Math.random() * 0.3;
+      const r = 25 + Math.random() * 30;
+      nodes.push({
+        x: CENTER + Math.cos(angle) * r,
+        y: CENTER + Math.sin(angle) * r,
+        baseX: CENTER + Math.cos(angle) * r,
+        baseY: CENTER + Math.sin(angle) * r,
+        radius: 3.5 + Math.random() * 1.5,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.008 + Math.random() * 0.006,
+        layer: 0,
+      });
+    }
+
+    // Mid ring (hidden layers)
+    for (let i = 0; i < 14; i++) {
+      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.2;
+      const r = 70 + Math.random() * 35;
+      nodes.push({
+        x: CENTER + Math.cos(angle) * r,
+        y: CENTER + Math.sin(angle) * r,
+        baseX: CENTER + Math.cos(angle) * r,
+        baseY: CENTER + Math.sin(angle) * r,
+        radius: 2.5 + Math.random() * 1.5,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.006 + Math.random() * 0.005,
+        layer: 1,
+      });
+    }
+
+    // Outer shell (input/output layer)
+    for (let i = 0; i < 18; i++) {
+      const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.15;
+      const r = 120 + Math.random() * 40;
+      nodes.push({
+        x: CENTER + Math.cos(angle) * r,
+        y: CENTER + Math.sin(angle) * r,
+        baseX: CENTER + Math.cos(angle) * r,
+        baseY: CENTER + Math.sin(angle) * r,
+        radius: 2 + Math.random() * 1,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.004 + Math.random() * 0.004,
+        layer: 2,
+      });
+    }
+
+    nodesRef.current = nodes;
+  }, []);
+
+  useEffect(() => {
+    initNodes();
+  }, [initNodes]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    canvas.width = SIZE * 2; // retina
+    canvas.height = SIZE * 2;
+    ctx.scale(2, 2);
+
+    let time = 0;
+
+    const layerColors = isDark
+      ? [
+          { node: '#c084fc', glow: 'rgba(192, 132, 252, 0.35)', line: 'rgba(192, 132, 252,' },
+          { node: '#22d3ee', glow: 'rgba(34, 211, 238, 0.3)', line: 'rgba(34, 211, 238,' },
+          { node: '#818cf8', glow: 'rgba(129, 140, 248, 0.25)', line: 'rgba(129, 140, 248,' },
+        ]
+      : [
+          { node: '#7c3aed', glow: 'rgba(124, 58, 237, 0.3)', line: 'rgba(124, 58, 237,' },
+          { node: '#0891b2', glow: 'rgba(8, 145, 178, 0.25)', line: 'rgba(8, 145, 178,' },
+          { node: '#4f46e5', glow: 'rgba(79, 70, 229, 0.2)', line: 'rgba(79, 70, 229,' },
+        ];
+
+    const draw = () => {
+      ctx.clearRect(0, 0, SIZE, SIZE);
+      time += 1;
+      const nodes = nodesRef.current;
+      const mouse = mouseRef.current;
+
+      // Animate node positions with organic breathing
+      nodes.forEach((n) => {
+        const breathX = Math.sin(time * n.speed + n.phase) * (6 + n.layer * 3);
+        const breathY = Math.cos(time * n.speed * 1.3 + n.phase) * (5 + n.layer * 2);
+
+        let targetX = n.baseX + breathX;
+        let targetY = n.baseY + breathY;
+
+        // Mouse attraction/repulsion
+        if (mouse.active) {
+          const dx = mouse.x - n.x;
+          const dy = mouse.y - n.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 130) {
+            const force = (130 - dist) / 130;
+            // Core nodes attracted, outer nodes repelled
+            const direction = n.layer === 0 ? 1 : -0.6;
+            targetX += dx * force * 0.15 * direction;
+            targetY += dy * force * 0.15 * direction;
+          }
+        }
+
+        n.x += (targetX - n.x) * 0.08;
+        n.y += (targetY - n.y) * 0.08;
+      });
+
+      // Draw synaptic connections
+      const maxDist = mouse.active ? 110 : 95;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const dist = Math.hypot(a.x - b.x, a.y - b.y);
+          if (dist < maxDist) {
+            const alpha = ((maxDist - dist) / maxDist) * (mouse.active ? 0.3 : 0.12);
+            const colorSet = layerColors[Math.min(a.layer, b.layer)];
+
+            // Pulsing signal traveling along the connection
+            const signalPhase = Math.sin(time * 0.03 + i * 0.5 + j * 0.3);
+            const signalAlpha = alpha * (0.6 + signalPhase * 0.4);
+
+            ctx.strokeStyle = `${colorSet.line} ${signalAlpha})`;
+            ctx.lineWidth = mouse.active ? 1.2 : 0.7;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+
+            // Draw a traveling "signal dot" along some connections
+            if (signalPhase > 0.5 && dist < 80) {
+              const t = (Math.sin(time * 0.05 + i) + 1) / 2;
+              const sx = a.x + (b.x - a.x) * t;
+              const sy = a.y + (b.y - a.y) * t;
+              ctx.beginPath();
+              ctx.arc(sx, sy, 1.2, 0, Math.PI * 2);
+              ctx.fillStyle = colorSet.node;
+              ctx.fill();
+            }
+          }
+        }
+      }
+
+      // Draw nodes
+      nodes.forEach((n) => {
+        const colorSet = layerColors[n.layer];
+        const pulseScale = 1 + Math.sin(time * 0.02 + n.phase) * 0.15;
+        const r = n.radius * pulseScale;
+
+        // Glow
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 3);
+        grad.addColorStop(0, colorSet.glow);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = colorSet.node;
+        ctx.fill();
+      });
+
+      animFrameRef.current = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [isDark]);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    mouseRef.current = {
+      x: ((e.clientX - rect.left) / rect.width) * SIZE,
+      y: ((e.clientY - rect.top) / rect.height) * SIZE,
+      active: true,
+    };
   };
 
   const handleMouseLeave = () => {
+    mouseRef.current.active = false;
     setIsHovered(false);
-    setCoords({ x: 0, y: 0 });
-    setActiveSector('SYS_LOCK: IDLE');
-    setHudColorClass(isDark ? 'text-cyan-400 border-cyan-400' : 'text-blue-600 border-blue-600');
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    dimensionsRef.current = { width, height };
-    
-    // Offset coordinates from the center of the container (-halfWidth to +halfWidth)
-    const x = e.clientX - rect.left - width / 2;
-    const y = e.clientY - rect.top - height / 2;
-    setCoords({ x, y });
-
-    // Determine sector (North, South, East, West) based on mouse position
-    if (Math.abs(x) > Math.abs(y)) {
-      if (x > 0) {
-        setActiveSector('SYS_SECTOR: EAST');
-        setHudColorClass(isDark ? 'text-pink-400 border-pink-400/50' : 'text-pink-600 border-pink-500/40');
-      } else {
-        setActiveSector('SYS_SECTOR: WEST');
-        setHudColorClass(isDark ? 'text-emerald-400 border-emerald-400/50' : 'text-emerald-600 border-emerald-500/40');
-      }
-    } else {
-      if (y > 0) {
-        setActiveSector('SYS_SECTOR: SOUTH');
-        setHudColorClass(isDark ? 'text-amber-400 border-amber-400/50' : 'text-amber-600 border-amber-500/40');
-      } else {
-        setActiveSector('SYS_SECTOR: NORTH');
-        setHudColorClass(isDark ? 'text-cyan-400 border-cyan-400/50' : 'text-blue-600 border-blue-500/40');
-      }
-    }
-  };
-
-  // Border and glow styles based on active sector when hovered
-  const getDynamicGlowClass = () => {
-    if (!isHovered) {
-      return isDark 
-        ? 'from-[#007AFF]/20 via-[#5AC8FA]/10 to-transparent opacity-25'
-        : 'from-[#007AFF]/30 via-slate-100 to-transparent opacity-25';
-    }
-    if (activeSector === 'SYS_SECTOR: EAST') {
-      return 'from-pink-500 via-[#8A2BE2] to-transparent opacity-60 scale-[1.3]';
-    }
-    if (activeSector === 'SYS_SECTOR: WEST') {
-      return 'from-emerald-400 via-teal-900 to-transparent opacity-60 scale-[1.3]';
-    }
-    if (activeSector === 'SYS_SECTOR: SOUTH') {
-      return 'from-amber-400 via-rose-900 to-transparent opacity-60 scale-[1.3]';
-    }
-    return 'from-cyan-400 via-blue-900 to-transparent opacity-60 scale-[1.3]';
   };
 
   return (
-    <motion.div 
+    <motion.div
       ref={containerRef}
-      onMouseEnter={handleMouseEnter}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
-      style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
-      className="relative w-full aspect-square max-w-[380px] md:max-w-[450px] mx-auto flex items-center justify-center select-none cursor-pointer group" 
-      id="luxury-orb-container"
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+      className="relative w-full aspect-square max-w-[340px] md:max-w-[400px] mx-auto flex items-center justify-center select-none cursor-pointer"
     >
-      {/* Cyberpunk HUD Targeting Reticle */}
-      <div className={`absolute inset-[-25px] md:inset-[-35px] pointer-events-none transition-all duration-700 select-none z-0 ${
-        isHovered 
-          ? 'opacity-90 scale-100 rotate-45' 
-          : 'opacity-0 scale-90 rotate-0'
-      }`}>
-        {/* Corner Brackets */}
-        <div className={`absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 transition-colors duration-300 ${hudColorClass.split(' ')[1]}`} />
-        <div className={`absolute top-0 left-0 w-1.5 h-1.5 transition-colors duration-300 bg-current ${hudColorClass.split(' ')[0]}`} />
-        
-        <div className={`absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 transition-colors duration-300 ${hudColorClass.split(' ')[1]}`} />
-        <div className={`absolute top-0 right-0 w-1.5 h-1.5 transition-colors duration-300 bg-current ${hudColorClass.split(' ')[0]}`} />
-
-        <div className={`absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 transition-colors duration-300 ${hudColorClass.split(' ')[1]}`} />
-        <div className={`absolute bottom-0 left-0 w-1.5 h-1.5 transition-colors duration-300 bg-current ${hudColorClass.split(' ')[0]}`} />
-
-        <div className={`absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 transition-colors duration-300 ${hudColorClass.split(' ')[1]}`} />
-        <div className={`absolute bottom-0 right-0 w-1.5 h-1.5 transition-colors duration-300 bg-current ${hudColorClass.split(' ')[0]}`} />
-
-        {/* HUD Sub-labels */}
-        <div className={`absolute top-2 left-8 font-mono text-[8px] uppercase tracking-widest transition-colors duration-300 ${hudColorClass.split(' ')[0]} animate-pulse`}>
-          {activeSector}
-        </div>
-        <div className={`absolute bottom-2 right-8 font-mono text-[8px] uppercase tracking-widest ${isDark ? 'text-pink-500/80' : 'text-purple-600/80'} animate-pulse`}>
-          TRK_COORD_X: {Math.round(coords.x)} Y: {Math.round(coords.y)}
-        </div>
-      </div>
-
-      {/* Dynamic Ambient Background Glow */}
-      <div 
-        className={`absolute inset-0 rounded-full blur-[80px] mix-blend-screen transition-all duration-500 ${getDynamicGlowClass()}`}
-        style={isHovered ? { transform: `translate(${coords.x * 0.1}px, ${coords.y * 0.1}px)` } : {}}
-      />
-
-      {/* Pulsing expanding neon shockwaves on hover trigger */}
-      <motion.div
-        key={`shockwave-cyan-${pulseTrigger}`}
-        initial={{ scale: 0.8, opacity: 0.8 }}
-        animate={pulseTrigger > 0 ? { scale: 2.2, opacity: 0 } : { scale: 0.8, opacity: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`absolute w-[180px] h-[180px] md:w-[240px] md:h-[240px] rounded-full border-2 pointer-events-none z-20 ${
-          isDark ? 'border-cyan-400' : 'border-blue-500'
-        }`}
-      />
-      <motion.div
-        key={`shockwave-pink-${pulseTrigger}`}
-        initial={{ scale: 0.75, opacity: 0.9 }}
-        animate={pulseTrigger > 0 ? { scale: 1.9, opacity: 0 } : { scale: 0.75, opacity: 0 }}
-        transition={{ duration: 0.9, ease: "easeOut", delay: 0.05 }}
-        className={`absolute w-[180px] h-[180px] md:w-[240px] md:h-[240px] rounded-full border pointer-events-none z-20 ${
-          isDark ? 'border-pink-500' : 'border-purple-500'
-        }`}
-      />
-
-      {/* Main Breathing Orb Center with 3D Tilt Parallax */}
-      <motion.div
-        animate={{ 
-          scale: isHovered ? 1.15 : 1,
-          rotateX: isHovered ? -coords.y / 6 : 0,
-          rotateY: isHovered ? coords.x / 6 : 0,
-          rotateZ: isHovered ? (coords.x * coords.y) / 250 : 0
-        }}
-        transition={{ 
-          scale: { type: 'spring', stiffness: 350, damping: 15 },
-          rotateX: { type: 'spring', stiffness: 200, damping: 15 },
-          rotateY: { type: 'spring', stiffness: 200, damping: 15 },
-          rotateZ: { type: 'spring', stiffness: 200, damping: 15 }
-        }}
-        className="relative z-10 w-[180px] h-[180px] md:w-[240px] md:h-[240px] rounded-full flex items-center justify-center"
-      >
-        {/* Core sphere with metallic/liquid mirror effect */}
-        <div 
-          className={`w-full h-full rounded-full transition-all duration-500 relative overflow-hidden shadow-2xl ${
-            isDark 
-              ? isHovered
-                ? 'bg-gradient-to-br from-neutral-700 via-[#1A0B2E] to-black border-2 border-[#00E5FF]/60 shadow-[inset_0_8px_32px_rgba(255,255,255,0.4),0_0_45px_rgba(0,229,255,0.5)]'
-                : 'bg-gradient-to-br from-neutral-800 via-slate-950 to-black border border-white/20 shadow-[inset_0_8px_32px_rgba(255,255,255,0.15)]' 
-              : isHovered
-                ? 'bg-gradient-to-br from-white via-[#E8F0FE] to-neutral-200 border-2 border-[#007AFF]/60 shadow-[inset_0_12px_44px_rgba(255,255,255,1),0_15px_35px_rgba(0,122,255,0.3)]'
-                : 'bg-gradient-to-br from-white via-slate-100 to-neutral-200 border border-black/10 shadow-[inset_0_12px_44px_rgba(255,255,255,1),0_15px_30px_rgba(0,0,0,0.06)]'
-          }`}
-        >
-          {/* Internal liquid highlight */}
-          <div 
-            className={`absolute w-[45%] h-[45%] rounded-full blur-[8px] transition-all duration-300 ${
-              isHovered 
-                ? 'bg-gradient-to-br from-white/40 to-transparent'
-                : isDark ? 'bg-gradient-to-br from-white/30 to-transparent' : 'bg-gradient-to-br from-white/90 to-transparent'
-            }`}
-            style={isHovered ? { 
-              top: `${10 + (coords.y / dimensionsRef.current.height) * 35}%`, 
-              left: `${15 + (coords.x / dimensionsRef.current.width) * 35}%` 
-            } : {
-              top: '10%',
-              left: '15%'
-            }}
-          />
-          {/* Secondary micro light pulse */}
-          <div 
-            className={`absolute bottom-[10%] right-[10%] w-[35%] h-[35%] rounded-full blur-[14px] bg-[#007AFF]/25 transition-all duration-500 ${
-              isHovered ? 'scale-125 bg-[#00E5FF]/45' : 'animate-[glow-pulse_5s_ease-in-out_infinite]'
-            }`}
-          />
-        </div>
-      </motion.div>
-
-      {/* Luxury Rings with dynamic orbital speed increases */}
-      {/* Outer Ring 1 - Fast Tilt Ring */}
-      <motion.div
-        animate={{ 
-          rotate: isHovered ? [0, 360] : [0, 360], 
-          scale: isHovered ? 1.15 : 1,
-        }}
-        transition={{ 
-          rotate: { repeat: Infinity, duration: isHovered ? 6 : 25, ease: "linear" },
-          scale: { type: 'spring', stiffness: 300, damping: 20 }
-        }}
-        style={{ transformOrigin: 'center' }}
-        className={`absolute w-[290px] h-[290px] md:w-[380px] md:h-[380px] rounded-full border border-dashed pointer-events-none transition-colors duration-500 ${
+      {/* Ambient halo behind the brain */}
+      <div
+        className={`absolute inset-[15%] rounded-full transition-all duration-700 pointer-events-none ${
           isHovered
-            ? 'border-current'
-            : isDark ? 'border-neutral-700/60' : 'border-neutral-300/80'
-        } ${hudColorClass.split(' ')[0]}`}
+            ? 'blur-[60px] scale-110 opacity-50'
+            : 'blur-[40px] scale-100 opacity-25'
+        } ${isDark ? 'bg-purple-500/40' : 'bg-indigo-400/30'}`}
       />
 
-      {/* Internal Interactive Ring 2 - Glass Refraction */}
-      <motion.div 
-        animate={{ scale: isHovered ? 1.18 : 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{ transform: 'rotateX(65deg) rotateY(15deg)', transformStyle: 'preserve-3d' }}
-        className="absolute w-[230px] h-[230px] md:w-[310px] md:h-[310px] pointer-events-none"
-      >
-        <div 
-          className={`w-full h-full rounded-full border transition-all duration-500 ${
-            isHovered
-              ? isDark 
-                ? 'animate-[spin-reverse_2s_linear_infinite] border-[#00E5FF] bg-white/[0.08] shadow-[0_0_35px_rgba(0,229,255,0.6),inset_0_0_15px_rgba(0,229,255,0.35)]' 
-                : 'animate-[spin-reverse_2s_linear_infinite] border-[#007AFF] bg-black/[0.04]'
-              : isDark 
-                ? 'animate-[spin-reverse_35s_linear_infinite] border-white/10 bg-white/[0.01]' 
-                : 'border-neutral-900/10 bg-black/[0.005] animate-[spin-reverse_35s_linear_infinite]'
-          }`}
-        />
-      </motion.div>
+      {/* The neural canvas */}
+      <canvas
+        ref={canvasRef}
+        style={{ width: SIZE, height: SIZE }}
+        className="relative z-10"
+      />
 
-      {/* Inner Metallic Precision Orbit Ring 3 */}
-      <motion.div 
-        animate={{ scale: isHovered ? 1.22 : 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        style={{ transform: 'rotateX(45deg) rotateY(-30deg)', transformStyle: 'preserve-3d' }}
-        className="absolute w-[320px] h-[320px] md:w-[410px] md:h-[410px] pointer-events-none"
-      >
-        <div 
-          className={`w-full h-full rounded-full border transition-all duration-500 ${
-            isHovered
-              ? isDark 
-                ? 'animate-[spin-slow_2.5s_linear_infinite] border-pink-400 shadow-[0_0_40px_rgba(244,63,94,0.65),inset_0_0_20px_rgba(244,63,94,0.35)]' 
-                : 'animate-[spin-slow_2.5s_linear_infinite] border-[#007AFF] bg-white/[0.02]'
-              : isDark 
-                ? 'animate-[spin-slow_45s_linear_infinite] border-sky-500/20' 
-                : 'border-slate-400/30 animate-[spin-slow_45s_linear_infinite]'
-          }`}
-        />
-      </motion.div>
-
-      {/* Floating Sparkles */}
+      {/* Subtle label */}
       <motion.div
-        animate={{ 
-          y: isHovered ? [0, -22, 0] : [0, -10, 0],
-          scale: isHovered ? 1.8 : 1
-        }}
-        transition={{ repeat: Infinity, duration: isHovered ? 1.2 : 4, ease: "easeInOut" }}
-        className={`absolute top-[20%] left-[10%] w-2 h-2 rounded-full transition-all duration-500 ${
-          isHovered 
-            ? 'bg-[#00E5FF] shadow-[0_0_15px_#00E5FF]' 
-            : isDark ? 'bg-indigo-400/40' : 'bg-neutral-600/40'
-        }`}
-      />
-      <motion.div
-        animate={{ 
-          y: isHovered ? [0, 20, 0] : [0, 8, 0],
-          scale: isHovered ? 1.8 : 1
-        }}
-        transition={{ repeat: Infinity, duration: isHovered ? 1.4 : 5, ease: "easeInOut", delay: 0.5 }}
-        className={`absolute bottom-[25%] right-[15%] w-1.5 h-1.5 rounded-full transition-all duration-500 ${
-          isHovered 
-            ? 'bg-[#FF007F] shadow-[0_0_15px_#FF007F]' 
-            : isDark ? 'bg-sky-400/35' : 'bg-slate-500/35'
-        }`}
-      />
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.4 }}
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 text-[9px] font-mono tracking-[0.3em] uppercase text-center pointer-events-none"
+      >
+        <span className={isDark ? 'text-purple-400/70' : 'text-indigo-500/70'}>
+          Neural Network Active
+        </span>
+      </motion.div>
     </motion.div>
   );
 }

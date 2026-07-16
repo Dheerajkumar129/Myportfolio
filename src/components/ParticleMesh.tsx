@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react';
 
-export default function ParticleMesh() {
+// A subtle animated constellation background — hexagonal grid nodes that
+// gently drift and form constellation patterns. Completely different from
+// the particle mesh network approach.
+export default function ConstellationGrid() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -10,88 +13,83 @@ export default function ParticleMesh() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    let particles: Array<{
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      radius: number;
-      baseRadius: number;
+    let stars: Array<{
+      x: number; y: number;
+      size: number; twinklePhase: number;
+      twinkleSpeed: number; drift: number;
     }> = [];
 
-    const mouse = { x: -1000, y: -1000, radius: 130 };
-
     const resize = () => {
-      canvas.width = canvas.parentElement?.offsetWidth || window.innerWidth;
-      canvas.height = canvas.parentElement?.offsetHeight || window.innerHeight;
-      init();
+      canvas.width = (canvas.parentElement?.offsetWidth || window.innerWidth) * 2;
+      canvas.height = (canvas.parentElement?.offsetHeight || window.innerHeight) * 2;
+      ctx.scale(2, 2);
+      initStars();
     };
 
-    const init = () => {
-      particles = [];
-      const density = Math.floor((canvas.width * canvas.height) / 12000);
-      const count = Math.min(density, 140); // capped at 140 for performance
+    const initStars = () => {
+      stars = [];
+      const w = canvas.width / 2;
+      const h = canvas.height / 2;
+      // Sparse star field — much sparser than a particle network
+      const count = Math.min(Math.floor((w * h) / 25000), 80);
       for (let i = 0; i < count; i++) {
-        const radius = Math.random() * 1.5 + 1;
-        particles.push({
-          x: Math.random() * canvas.width,
-          y: Math.random() * canvas.height,
-          vx: (Math.random() - 0.5) * 0.4,
-          vy: (Math.random() - 0.5) * 0.4,
-          radius: radius,
-          baseRadius: radius,
+        stars.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          size: Math.random() * 1.5 + 0.5,
+          twinklePhase: Math.random() * Math.PI * 2,
+          twinkleSpeed: 0.005 + Math.random() * 0.01,
+          drift: (Math.random() - 0.5) * 0.08,
         });
       }
     };
 
+    let time = 0;
+
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = 'rgba(99, 102, 241, 0.4)';
-      ctx.strokeStyle = 'rgba(99, 102, 241, 0.05)';
+      const w = canvas.width / 2;
+      const h = canvas.height / 2;
+      ctx.clearRect(0, 0, w, h);
+      time++;
 
-      // Update and draw particles
-      particles.forEach((p) => {
-        // Move particles
-        p.x += p.vx;
-        p.y += p.vy;
+      // Draw and animate stars
+      stars.forEach((s) => {
+        // Gentle vertical drift
+        s.y += s.drift;
+        if (s.y < -5) s.y = h + 5;
+        if (s.y > h + 5) s.y = -5;
 
-        // Bounce on borders
-        if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
-        if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        // Twinkle
+        const twinkle = 0.3 + Math.sin(time * s.twinkleSpeed + s.twinklePhase) * 0.35 + 0.35;
+        const alpha = twinkle * 0.5;
 
-        // Mouse interaction
-        const dx = mouse.x - p.x;
-        const dy = mouse.y - p.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist < mouse.radius) {
-          const force = (mouse.radius - dist) / mouse.radius;
-          const angle = Math.atan2(dy, dx);
-          // Push particles away gently
-          p.x -= Math.cos(angle) * force * 1.5;
-          p.y -= Math.sin(angle) * force * 1.5;
-          ctx.fillStyle = 'rgba(6, 182, 212, 0.7)';
-        } else {
-          ctx.fillStyle = 'rgba(99, 102, 241, 0.4)';
-        }
-
+        // Draw star glow
         ctx.beginPath();
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, s.size * 3, 0, Math.PI * 2);
+        const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.size * 3);
+        grad.addColorStop(0, `rgba(168, 85, 247, ${alpha * 0.4})`);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        // Draw star core
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(226, 232, 240, ${alpha})`;
         ctx.fill();
       });
 
-      // Draw connecting lines
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const p1 = particles[i];
-          const p2 = particles[j];
-          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-          if (dist < 100) {
-            const alpha = ((100 - dist) / 100) * 0.12;
-            ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
-            ctx.lineWidth = 0.6;
+      // Draw faint constellation lines between close stars
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dist = Math.hypot(stars[i].x - stars[j].x, stars[i].y - stars[j].y);
+          if (dist < 120) {
+            const alpha = ((120 - dist) / 120) * 0.04;
+            ctx.strokeStyle = `rgba(168, 85, 247, ${alpha})`;
+            ctx.lineWidth = 0.4;
             ctx.beginPath();
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
+            ctx.moveTo(stars[i].x, stars[i].y);
+            ctx.lineTo(stars[j].x, stars[j].y);
             ctx.stroke();
           }
         }
@@ -100,36 +98,26 @@ export default function ParticleMesh() {
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-    };
-
-    const handleMouseLeave = () => {
-      mouse.x = -1000;
-      mouse.y = -1000;
-    };
-
-    window.addEventListener('resize', resize);
-    canvas.parentElement?.addEventListener('mousemove', handleMouseMove);
-    canvas.parentElement?.addEventListener('mouseleave', handleMouseLeave);
-
     resize();
     draw();
 
+    const handleResize = () => {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      resize();
+    };
+
+    window.addEventListener('resize', handleResize);
+
     return () => {
       cancelAnimationFrame(animationFrameId);
-      window.removeEventListener('resize', resize);
-      canvas.parentElement?.removeEventListener('mousemove', handleMouseMove);
-      canvas.parentElement?.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-0"
+      className="absolute inset-0 w-full h-full pointer-events-none z-0 opacity-60"
     />
   );
 }
